@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "title": "Information municipale",
+    "category": "Communiqué",
+    "date": "À compléter",
+    "summary": "Retrouvez prochainement les dernières informations de la commune."
+  },
+  {
+    "id": 2,
+    "title": "Vie de la commune",
+    "category": "Vie communale",
+    "date": "À compléter",
+    "summary": "Les actualités et annonces officielles de la Mairie de Bingerville."
+  },
+  {
+    "id": 3,
+    "title": "Services aux habitants",
+    "category": "Services municipaux",
+    "date": "À compléter",
+    "summary": "Suivez les informations relatives aux services municipaux."
+  }
+]
