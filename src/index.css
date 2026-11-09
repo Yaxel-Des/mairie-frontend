@@ -83,4 +83,46 @@ a {
   .todo-note {
     @apply rounded-md border border-dashed border-mairie-goldDeep/50 bg-mairie-goldSoft px-4 py-3 text-sm leading-6 text-mairie-goldDeep;
   }
+
+  .cms-content {
+    @apply mx-auto max-w-prose text-base leading-relaxed text-mairie-ink;
+  }
+
+  .cms-content > * + * {
+    @apply mt-4;
+  }
+
+  .cms-content h2,
+  .cms-content h3,
+  .cms-content h4 {
+    @apply font-serif font-semibold text-mairie-brown;
+  }
+
+  .cms-content h2 {
+    @apply mt-8 text-2xl;
+  }
+
+  .cms-content h3 {
+    @apply mt-6 text-xl;
+  }
+
+  .cms-content ul {
+    @apply list-disc pl-6;
+  }
+
+  .cms-content ol {
+    @apply list-decimal pl-6;
+  }
+
+  .cms-content li + li {
+    @apply mt-2;
+  }
+
+  .cms-content a {
+    @apply text-mairie-lagoon underline underline-offset-2;
+  }
+
+  .cms-content blockquote {
+    @apply border-l-4 border-mairie-gold pl-4 italic;
+  }
 }

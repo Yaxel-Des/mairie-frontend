@@ -55,14 +55,14 @@ export default function LaMairie() {
       <div className="wrap space-y-12 py-10">
         {isLoading ? <Loading /> : error ? <ApiError message={error} /> : null}
 
-        <div className="grid gap-12 lg:grid-cols-2">
+        <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
           <section aria-labelledby="presentation-heading">
             <h2 id="presentation-heading" className="font-serif text-2xl font-semibold text-mairie-brown">
               Présentation de la Mairie
             </h2>
             {presentation ? (
               <div
-                className="mt-4 text-base leading-7 text-mairie-ink"
+                className="cms-content mt-4"
                 dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(presentation) }}
               />
             ) : (
@@ -76,7 +76,7 @@ export default function LaMairie() {
             </h2>
             {history ? (
               <div
-                className="mt-4 text-base leading-7 text-mairie-ink"
+                className="cms-content mt-4"
                 dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(history) }}
               />
             ) : (
@@ -85,7 +85,7 @@ export default function LaMairie() {
           </section>
         </div>
 
-        <section aria-labelledby="council-heading">
+        <section aria-labelledby="council-heading" className="border-t border-mairie-line pt-8">
           <h2 id="council-heading" className="font-serif text-2xl font-semibold text-mairie-brown">
             Le Conseil Municipal
           </h2>
@@ -102,13 +102,13 @@ export default function LaMairie() {
           )}
         </section>
 
-        <section aria-labelledby="organization-chart-heading">
+        <section aria-labelledby="organization-chart-heading" className="border-t border-mairie-line pt-8">
           <h2 id="organization-chart-heading" className="font-serif text-2xl font-semibold text-mairie-brown">
             L’Organigramme
           </h2>
           {organization ? (
             <div
-              className="mt-4 text-base leading-7 text-mairie-ink"
+              className="cms-content mt-4"
               dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(organization) }}
             />
           ) : (

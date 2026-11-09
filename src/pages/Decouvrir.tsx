@@ -30,7 +30,7 @@ export default function Decouvrir() {
           </h2>
           {history ? (
             <div
-              className="mt-4 max-w-3xl text-base leading-7 text-mairie-ink"
+              className="cms-content mt-4"
               dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(history) }}
             />
           ) : (
@@ -46,7 +46,7 @@ export default function Decouvrir() {
           </h2>
           {heritage ? (
             <div
-              className="mt-4 text-base leading-7 text-mairie-ink"
+              className="cms-content mt-4"
               dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(heritage) }}
             />
           ) : (
@@ -63,7 +63,7 @@ export default function Decouvrir() {
           </h2>
           {facilities ? (
             <div
-              className="mt-4 text-base leading-7 text-mairie-ink"
+              className="cms-content mt-4"
               dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(facilities) }}
             />
           ) : (

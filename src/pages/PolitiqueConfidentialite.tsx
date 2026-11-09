@@ -59,7 +59,7 @@ export default function PolitiqueConfidentialite() {
             </h2>
             {content ? (
               <div
-                className="mt-3 text-base leading-7 text-mairie-ink"
+                className="cms-content mt-3"
                 dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(content) }}
               />
             ) : (

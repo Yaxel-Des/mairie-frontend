@@ -174,7 +174,7 @@ export default function Services() {
                 <h3 className="font-serif text-lg font-semibold text-mairie-brown">Pièces à fournir</h3>
                 {requiredDocuments ? (
                   <div
-                    className="mt-3 space-y-3 text-base leading-7 text-mairie-ink [&_h2]:font-serif [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-mairie-brown [&_h3]:font-serif [&_h3]:font-semibold [&_h3]:text-mairie-brown [&_ul]:list-disc [&_ol]:list-decimal [&_li]:ml-6 [&_a]:text-mairie-lagoon [&_a]:underline [&_a]:underline-offset-2"
+                    className="cms-content mt-3 space-y-3 [&_h2]:text-lg [&_ul]:pl-6 [&_ol]:pl-6 [&_li]:ml-6"
                     dangerouslySetInnerHTML={{ __html: requiredDocuments }}
                   />
                 ) : (

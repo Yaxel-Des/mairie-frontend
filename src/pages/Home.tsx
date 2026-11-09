@@ -148,7 +148,7 @@ export default function Home() {
                 <div>
                   {mayorMessage ? (
                     <div
-                      className="max-w-2xl whitespace-pre-line text-base leading-7 text-mairie-ink"
+                      className="cms-content mx-0 max-w-2xl whitespace-pre-line"
                       dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(mayorMessage) }}
                     />
                   ) : (

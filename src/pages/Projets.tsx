@@ -38,7 +38,7 @@ export default function Projets() {
           <>
             {getTextField(data?.settings ?? null, 'TexteInvestir') && (
               <div
-                className="mb-8 text-base leading-7 text-mairie-ink"
+                className="cms-content mb-8"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeCmsHtml(getTextField(data?.settings ?? null, 'TexteInvestir')),
                 }}
@@ -58,7 +58,7 @@ export default function Projets() {
                         </h2>
                         {description ? (
                           <div
-                            className="mt-2 text-base leading-7 text-mairie-ink"
+                            className="cms-content mt-2"
                             dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(description) }}
                           />
                         ) : (
