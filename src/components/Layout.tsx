@@ -6,7 +6,12 @@ import Icon from './Icon';
 import SiteSearch from './SiteSearch';
 import { mainNavigation } from './navigation';
 import { homeAlert } from '../data/mockData';
-import { getContactParametres, getTextField, type StrapiRecord } from '../data/api';
+import {
+  getContactParametres,
+  getMairieParametres,
+  getTextField,
+  type StrapiRecord,
+} from '../data/api';
 
 function navLinkClass(isActive: boolean) {
   return [
@@ -45,6 +50,8 @@ export default function Layout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [contactParams, setContactParams] = useState<StrapiRecord | null>(null);
   const [contactParamsError, setContactParamsError] = useState('');
+  const [mairieParams, setMairieParams] = useState<StrapiRecord | null>(null);
+  const [mairieParamsError, setMairieParamsError] = useState('');
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -71,6 +78,23 @@ export default function Layout() {
             cause instanceof Error
               ? cause.message
               : 'Impossible de charger les liens des réseaux sociaux.',
+          );
+        }
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    getMairieParametres(controller.signal)
+      .then(setMairieParams)
+      .catch((cause: unknown) => {
+        if (!controller.signal.aborted) {
+          setMairieParamsError(
+            cause instanceof Error
+              ? cause.message
+              : 'Impossible de charger les coordonnées de la Mairie.',
           );
         }
       });
@@ -213,9 +237,32 @@ export default function Layout() {
             </h2>
             <address className="mt-3 space-y-1.5 text-sm not-italic leading-6 text-white/85">
               <p>Mairie de Bingerville</p>
-              <p className="todo-note">[À COMPLÉTER PAR LA MAIRIE : adresse complète.]</p>
-              <p className="todo-note">[À COMPLÉTER PAR LA MAIRIE : téléphone.]</p>
-              <p className="todo-note">[À COMPLÉTER PAR LA MAIRIE : e-mail.]</p>
+              {mairieParamsError ? (
+                <p className="text-sm text-white/85" role="alert">{mairieParamsError}</p>
+              ) : (
+                <>
+                  {getTextField(mairieParams, 'Adresse') && (
+                    <p>{getTextField(mairieParams, 'Adresse')}</p>
+                  )}
+                  {getTextField(mairieParams, 'Telephone', 'Téléphone') && (
+                    <p>
+                      <a
+                        className={footerLinkClass}
+                        href={`tel:${getTextField(mairieParams, 'Telephone', 'Téléphone').replace(/[^\d+]/g, '')}`}
+                      >
+                        {getTextField(mairieParams, 'Telephone', 'Téléphone')}
+                      </a>
+                    </p>
+                  )}
+                  {getTextField(mairieParams, 'Email', 'E-mail') && (
+                    <p>
+                      <a className={footerLinkClass} href={`mailto:${getTextField(mairieParams, 'Email', 'E-mail')}`}>
+                        {getTextField(mairieParams, 'Email', 'E-mail')}
+                      </a>
+                    </p>
+                  )}
+                </>
+              )}
             </address>
           </section>
 
@@ -243,38 +290,43 @@ export default function Layout() {
             </ul>
           </nav>
 
-          <section aria-labelledby="footer-social">
-            <h2 id="footer-social" className="font-serif text-lg font-semibold text-mairie-gold">
-              Suivez-nous
-            </h2>
-            {contactParamsError ? (
-              <p className="mt-3 text-sm leading-6 text-white/85" role="status">
-                Les liens des réseaux sociaux ne sont pas disponibles.
-              </p>
-            ) : (
-              <ul className="mt-3 flex flex-wrap gap-2">
-                {socialNetworks.map(({ field, label, Icon: SocialIcon }) => {
-                  const rawUrl = getTextField(contactParams, field);
-                  const url = rawUrl ? getSocialUrl(rawUrl) : null;
-                  if (!url) return null;
+          {(contactParamsError || socialNetworks.some(({ field }) => {
+            const value = getTextField(contactParams, field);
+            return value ? getSocialUrl(value) !== null : false;
+          })) && (
+            <section aria-labelledby="footer-social">
+              <h2 id="footer-social" className="font-serif text-lg font-semibold text-mairie-gold">
+                Suivez-nous
+              </h2>
+              {contactParamsError ? (
+                <p className="mt-3 text-sm leading-6 text-white/85" role="alert">
+                  {contactParamsError}
+                </p>
+              ) : (
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  {socialNetworks.map(({ field, label, Icon: SocialIcon }) => {
+                    const rawUrl = getTextField(contactParams, field);
+                    const url = rawUrl ? getSocialUrl(rawUrl) : null;
+                    if (!url) return null;
 
-                  return (
-                    <li key={field}>
-                      <a
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={label}
-                        className="flex h-11 w-11 items-center justify-center text-white transition-colors hover:text-mairie-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mairie-gold"
-                      >
-                        <SocialIcon aria-hidden="true" className="h-6 w-6" />
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </section>
+                    return (
+                      <li key={field}>
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={label}
+                          className="flex h-11 w-11 items-center justify-center text-white transition-colors hover:text-mairie-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mairie-gold"
+                        >
+                          <SocialIcon aria-hidden="true" className="h-6 w-6" />
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </section>
+          )}
         </div>
 
         <div className="border-t border-white/15">
