@@ -92,7 +92,7 @@ export function getPageLegale(signal?: AbortSignal): Promise<StrapiRecord | null
 }
 
 export function getContactParametres(signal?: AbortSignal): Promise<StrapiRecord | null> {
-  return getSingle('/api/contact-parametre?populate=*', signal);
+  return getSingle('/api/contact-parametres?populate=*', signal);
 }
 
 export function getImageUrl(
