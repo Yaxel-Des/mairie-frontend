@@ -27,6 +27,12 @@ type StrapiActualite = {
 
 export const actualitePlaceholder = '/images/actualite-placeholder.svg';
 
+export function truncateSummary(summary: string, maxLength = 150): string {
+  const normalizedSummary = summary.trim().replace(/\s+/g, ' ');
+  if (normalizedSummary.length <= maxLength) return normalizedSummary;
+  return `${normalizedSummary.slice(0, maxLength - 3).trimEnd()}...`;
+}
+
 export async function fetchActualites(signal?: AbortSignal): Promise<Actualite[]> {
   const result = await fetchApiData<StrapiActualite[]>('/api/actualites?populate=*', signal);
   if (!Array.isArray(result)) {

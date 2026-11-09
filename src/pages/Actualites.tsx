@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../components/Icon';
 import PageHeader from '../components/PageHeader';
-import { fetchActualites, type Actualite } from '../data/actualitesApi';
+import { fetchActualites, truncateSummary, type Actualite } from '../data/actualitesApi';
 
 export default function Actualites() {
   const [news, setNews] = useState<Actualite[]>([]);
@@ -49,9 +49,9 @@ export default function Actualites() {
             {news.map((item) => (
               <li
                 key={item.id}
-                className="card group relative overflow-hidden transition-colors hover:border-mairie-lagoon"
+                className="card group relative h-full overflow-hidden transition-colors hover:border-mairie-lagoon"
               >
-                <article>
+                <article className="flex h-full flex-col">
                   <img
                     src={item.imageUrl}
                     alt={item.imageAlt || item.title}
@@ -60,7 +60,7 @@ export default function Actualites() {
                     height="480"
                     loading="lazy"
                   />
-                  <div className="p-5">
+                  <div className="flex flex-1 flex-col p-5">
                     <div className="flex flex-wrap gap-2 text-sm font-semibold text-mairie-muted">
                       <span className="rounded-full bg-mairie-lagoonSoft px-2.5 py-1 text-mairie-lagoonDeep">
                         {item.category}
@@ -70,9 +70,11 @@ export default function Actualites() {
                     <h2 className="mt-3 font-serif text-xl font-semibold leading-snug text-mairie-brown">
                       {item.title}
                     </h2>
-                    <p className="mt-2 text-sm leading-6 text-mairie-muted">{item.summary}</p>
+                    <p className="mt-2 min-h-[4.5rem] line-clamp-3 text-sm leading-6 text-mairie-muted">
+                      {truncateSummary(item.summary)}
+                    </p>
                     <Link
-                      className="mt-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-mairie-lagoon after:absolute after:inset-0 group-hover:text-mairie-lagoonDeep"
+                      className="mt-auto inline-flex min-h-11 items-center gap-1.5 pt-4 text-sm font-semibold text-mairie-lagoon after:absolute after:inset-0 group-hover:text-mairie-lagoonDeep"
                       to={`/actualites/${item.id}`}
                     >
                       Lire l’actualité

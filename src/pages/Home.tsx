@@ -11,7 +11,7 @@ import {
   getTextField,
   sanitizeCmsHtml,
 } from '../data/api';
-import { fetchActualites, type Actualite } from '../data/actualitesApi';
+import { fetchActualites, truncateSummary, type Actualite } from '../data/actualitesApi';
 import { quickLinks } from '../data/mockData';
 import useApiResource from '../hooks/useApiResource';
 
@@ -201,8 +201,8 @@ export default function Home() {
           ) : (
             <ul className="mt-8 grid gap-5 md:grid-cols-3">
             {latestNews.map((item) => (
-              <li key={item.id} className="card group relative overflow-hidden transition-colors hover:border-mairie-lagoon">
-                <article>
+              <li key={item.id} className="card group relative h-full overflow-hidden transition-colors hover:border-mairie-lagoon">
+                <article className="flex h-full flex-col">
                   <img
                     src={item.imageUrl}
                     alt={item.imageAlt || item.title}
@@ -211,7 +211,7 @@ export default function Home() {
                     width="640"
                     height="480"
                   />
-                  <div className="p-5">
+                  <div className="flex flex-1 flex-col p-5">
                     <span className="rounded-full bg-mairie-lagoonSoft px-2.5 py-1 text-sm font-semibold text-mairie-lagoonDeep">
                       {item.category}
                     </span>
@@ -221,9 +221,11 @@ export default function Home() {
                     <h3 className="mt-3 font-serif text-xl font-semibold leading-snug text-mairie-brown">
                       {item.title}
                     </h3>
-                    <p className="mt-2 text-sm leading-6 text-mairie-muted">{item.summary}</p>
+                    <p className="mt-2 min-h-[4.5rem] line-clamp-3 text-sm leading-6 text-mairie-muted">
+                      {truncateSummary(item.summary)}
+                    </p>
                     <Link
-                      className="mt-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-mairie-lagoon after:absolute after:inset-0 group-hover:text-mairie-lagoonDeep"
+                      className="mt-auto inline-flex min-h-11 items-center gap-1.5 pt-4 text-sm font-semibold text-mairie-lagoon after:absolute after:inset-0 group-hover:text-mairie-lagoonDeep"
                       to={`/actualites/${item.id}`}
                     >
                       Lire l’actualité
