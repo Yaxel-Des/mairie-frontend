@@ -64,7 +64,7 @@ export function getMairieParametres(signal?: AbortSignal): Promise<StrapiRecord 
 }
 
 export function getDecouvrirParametres(signal?: AbortSignal): Promise<StrapiRecord | null> {
-  return getSingle('/api/decouvrir-parametres?populate=*', signal);
+  return getSingle('/api/decouvrir-parametre?populate=*', signal);
 }
 
 export function getAdjoints(signal?: AbortSignal): Promise<StrapiRecord[]> {
@@ -84,11 +84,11 @@ export function getProjets(signal?: AbortSignal): Promise<StrapiRecord[]> {
 }
 
 export function getProjetsParametres(signal?: AbortSignal): Promise<StrapiRecord | null> {
-  return getSingle('/api/projets-parametres?populate=*', signal);
+  return getSingle('/api/rojets-parametre?populate=*', signal);
 }
 
-export function getMentionsLegales(signal?: AbortSignal): Promise<StrapiRecord | null> {
-  return getSingle('/api/mentions-legales?populate=*', signal);
+export function getPageLegale(signal?: AbortSignal): Promise<StrapiRecord | null> {
+  return getSingle('/api/page-legale?populate=*', signal);
 }
 
 export function getContactParametres(signal?: AbortSignal): Promise<StrapiRecord | null> {

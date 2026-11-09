@@ -1,7 +1,7 @@
 import ApiError from '../components/ApiError';
 import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
-import { getMentionsLegales, getTextField } from '../data/api';
+import { getPageLegale, getTextField, sanitizeCmsHtml } from '../data/api';
 import useApiResource from '../hooks/useApiResource';
 
 const unavailableMessage = 'Cette information sera bientôt disponible.';
@@ -25,7 +25,7 @@ const legalSections = [
 ];
 
 export default function MentionsLegales() {
-  const { data, isLoading, error } = useApiResource(getMentionsLegales);
+  const { data, isLoading, error } = useApiResource(getPageLegale);
   const address = getTextField(data, 'Adresse');
   const phone = getTextField(data, 'Telephone', 'Téléphone');
   const email = getTextField(data, 'Email', 'E-mail');
@@ -62,9 +62,16 @@ export default function MentionsLegales() {
                 <h2 id={section.id} className="font-serif text-2xl font-semibold text-mairie-brown">
                   {section.title}
                 </h2>
-                <p className="mt-3 text-base leading-7 text-mairie-ink">
-                  {getTextField(data, ...section.fields) || unavailableMessage}
-                </p>
+                {getTextField(data, ...section.fields) ? (
+                  <div
+                    className="mt-3 text-base leading-7 text-mairie-ink"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeCmsHtml(getTextField(data, ...section.fields)),
+                    }}
+                  />
+                ) : (
+                  <p className="mt-3 text-base leading-7 text-mairie-ink">{unavailableMessage}</p>
+                )}
               </section>
             ))}
           </>

@@ -1,4 +1,8 @@
+import ApiError from '../components/ApiError';
+import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
+import { getPageLegale, getTextField, sanitizeCmsHtml } from '../data/api';
+import useApiResource from '../hooks/useApiResource';
 
 const unavailableMessage = 'Cette information sera bientôt disponible.';
 
@@ -6,22 +10,28 @@ const privacySections = [
   {
     id: 'collected-data',
     title: 'Données collectées',
+    fields: ['DonneesCollectees', 'DonnéesCollectées'],
   },
   {
     id: 'purposes',
     title: 'Finalités du traitement',
+    fields: ['Finalites', 'Finalités'],
   },
   {
     id: 'retention',
     title: 'Durée de conservation',
+    fields: ['DureeConservation', 'DuréeConservation'],
   },
   {
     id: 'users-rights',
     title: 'Droits des usagers',
+    fields: ['DroitsUsagers', 'DroitsDesUsagers'],
   },
 ];
 
 export default function PolitiqueConfidentialite() {
+  const { data, isLoading, error } = useApiResource(getPageLegale);
+
   return (
     <>
       <PageHeader
@@ -30,11 +40,12 @@ export default function PolitiqueConfidentialite() {
       />
 
       <article className="wrap max-w-4xl space-y-6 py-10">
-        <p className="rounded-md border-l-4 border-mairie-gold bg-white px-5 py-4 text-base leading-7 text-mairie-ink">
-          {unavailableMessage}
-        </p>
+        {isLoading ? <Loading /> : null}
+        {error ? <ApiError message={error} /> : null}
 
-        {privacySections.map((section) => (
+        {!isLoading && !error && privacySections.map((section) => {
+          const content = getTextField(data, ...section.fields);
+          return (
           <section
             key={section.id}
             aria-labelledby={`${section.id}-heading`}
@@ -46,9 +57,17 @@ export default function PolitiqueConfidentialite() {
             >
               {section.title}
             </h2>
-            <p className="mt-3 text-base leading-7 text-mairie-ink">{unavailableMessage}</p>
+            {content ? (
+              <div
+                className="mt-3 text-base leading-7 text-mairie-ink"
+                dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(content) }}
+              />
+            ) : (
+              <p className="mt-3 text-base leading-7 text-mairie-ink">{unavailableMessage}</p>
+            )}
           </section>
-        ))}
+          );
+        })}
       </article>
     </>
   );

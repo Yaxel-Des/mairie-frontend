@@ -3,26 +3,73 @@ import ApiError from '../components/ApiError';
 import Icon from '../components/Icon';
 import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
+import { getDemarches, getMediaFileUrl, getRecordKey, getTextField, sanitizeCmsHtml } from '../data/api';
 import { procedureIcons } from '../components/procedureIcons';
-import { getDemarches, getMediaFileUrl, getRecordKey, getTextField } from '../data/api';
 import useApiResource from '../hooks/useApiResource';
 
 const unavailableMessage = 'Cette information sera bientôt disponible.';
 
-function getRequiredDocuments(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
+function escapeHtml(value: string): string {
   return value
-    .map((item) => {
-      if (typeof item === 'string') return item;
-      if (item && typeof item === 'object' && 'Nom' in item && typeof item.Nom === 'string') {
-        return item.Nom;
-      }
-      if (item && typeof item === 'object' && 'name' in item && typeof item.name === 'string') {
-        return item.name;
-      }
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function getRichTextHtml(value: unknown): string {
+  if (typeof value === 'string') return sanitizeCmsHtml(value);
+  if (!Array.isArray(value)) return '';
+
+  const renderInline = (node: unknown): string => {
+    if (Array.isArray(node)) return node.map(renderInline).join('');
+    if (!node || typeof node !== 'object') return '';
+
+    if ('text' in node && typeof node.text === 'string') {
+      let text = escapeHtml(node.text);
+      if ('italic' in node && node.italic === true) text = `<em>${text}</em>`;
+      if ('bold' in node && node.bold === true) text = `<strong>${text}</strong>`;
+      return text;
+    }
+
+    if (!('children' in node) || !Array.isArray(node.children)) return '';
+    const children = node.children.map(renderInline).join('');
+
+    if ('type' in node && node.type === 'link' && 'url' in node && typeof node.url === 'string') {
+      return `<a href="${escapeHtml(node.url)}">${children}</a>`;
+    }
+
+    return children;
+  };
+
+  const renderBlock = (block: unknown): string => {
+    if (!block || typeof block !== 'object' || !('children' in block) || !Array.isArray(block.children)) {
       return '';
-    })
-    .filter(Boolean);
+    }
+
+    const children = block.children;
+    const content = children.map(renderInline).join('');
+    if (!('type' in block) || typeof block.type !== 'string') return content;
+
+    switch (block.type) {
+      case 'paragraph':
+        return `<p>${content}</p>`;
+      case 'heading':
+        return `<h${'level' in block && block.level === 2 ? '2' : '3'}>${content}</h${'level' in block && block.level === 2 ? '2' : '3'}>`;
+      case 'list': {
+        const tag = 'format' in block && block.format === 'ordered' ? 'ol' : 'ul';
+        const items = children.map((item) => `<li>${renderInline(item)}</li>`).join('');
+        return `<${tag}>${items}</${tag}>`;
+      }
+      case 'quote':
+        return `<blockquote>${content}</blockquote>`;
+      default:
+        return content;
+    }
+  };
+
+  return sanitizeCmsHtml(value.map(renderBlock).join(''));
 }
 
 export default function Services() {
@@ -35,8 +82,8 @@ export default function Services() {
     null;
   const selectedId = selectedService ? getRecordKey(selectedService) : '';
   const requiredDocuments = selectedService
-    ? getRequiredDocuments(selectedService.Pieces ?? selectedService.PiecesAFournir ?? selectedService.DocumentsRequis)
-    : [];
+    ? getRichTextHtml(selectedService.Pieces ?? selectedService.PiecesAFournir ?? selectedService.DocumentsRequis)
+    : '';
   const pdfUrl = selectedService
     ? getMediaFileUrl(selectedService.Pdf ?? selectedService.FichierPDF ?? selectedService.Fichier)
     : null;
@@ -125,17 +172,12 @@ export default function Services() {
 
               <div className="px-6 py-6 sm:px-8">
                 <h3 className="font-serif text-lg font-semibold text-mairie-brown">Pièces à fournir</h3>
-                <ul className="mt-3 space-y-2.5">
-                  {requiredDocuments.map((document) => (
-                    <li key={document} className="flex items-start gap-3 text-sm leading-6 text-mairie-ink">
-                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-mairie-lagoonSoft text-mairie-lagoon">
-                        <Icon name="check" className="h-3.5 w-3.5" />
-                      </span>
-                      {document}
-                    </li>
-                  ))}
-                </ul>
-                {requiredDocuments.length === 0 && (
+                {requiredDocuments ? (
+                  <div
+                    className="mt-3 space-y-3 text-base leading-7 text-mairie-ink [&_h2]:font-serif [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-mairie-brown [&_h3]:font-serif [&_h3]:font-semibold [&_h3]:text-mairie-brown [&_ul]:list-disc [&_ol]:list-decimal [&_li]:ml-6 [&_a]:text-mairie-lagoon [&_a]:underline [&_a]:underline-offset-2"
+                    dangerouslySetInnerHTML={{ __html: requiredDocuments }}
+                  />
+                ) : (
                   <p className="mt-3 text-base text-mairie-muted">{unavailableMessage}</p>
                 )}
 

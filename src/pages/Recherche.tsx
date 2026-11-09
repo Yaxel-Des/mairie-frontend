@@ -1,6 +1,17 @@
 import { Link, useSearchParams } from 'react-router-dom';
+import ApiError from '../components/ApiError';
+import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
-import { mayorMessage, municipalDocuments, news, projects, services } from '../data/mockData';
+import {
+  getDemarches,
+  getDocuments,
+  getMediaFileUrl,
+  getRecordKey,
+  getTextField,
+  type StrapiRecord,
+} from '../data/api';
+import { fetchActualites } from '../data/actualitesApi';
+import useApiResource from '../hooks/useApiResource';
 
 type SearchResult = {
   title: string;
@@ -11,16 +22,31 @@ type SearchResult = {
 
 const pages: SearchResult[] = [
   { title: 'Accueil', description: 'Actualités, démarches et informations communales.', url: '/', kind: 'page' },
-  { title: 'La Mairie', description: 'Mot du Maire, conseil municipal et organisation.', url: '/mairie', kind: 'page' },
+  { title: 'La Mairie', description: 'Conseil municipal et organisation de la Mairie.', url: '/mairie', kind: 'page' },
   { title: 'Services municipaux', description: 'Les démarches administratives de la commune.', url: '/services', kind: 'page' },
-  { title: 'Mot du Maire', description: mayorMessage, url: '/mairie', kind: 'page' },
   { title: 'Actualités', description: 'Actualités et annonces de la Mairie.', url: '/actualites', kind: 'page' },
   { title: 'Projets communaux', description: 'Les projets de développement de la commune.', url: '/projets', kind: 'page' },
   { title: 'Contact', description: 'Contacter la Mairie de Bingerville.', url: '/contact', kind: 'page' },
   { title: 'Découvrir Bingerville', description: 'Histoire et patrimoine de la commune.', url: '/decouvrir-bingerville', kind: 'page' },
   { title: 'Documents municipaux', description: 'Délibérations et arrêtés à télécharger.', url: '/documents', kind: 'page' },
-  { title: 'Patrimoine de Bingerville', description: 'Histoire, jardin botanique, musée et lieux utiles.', url: '/decouvrir-bingerville', kind: 'page' },
+  { title: 'Politique de confidentialité', description: 'Protection des données personnelles.', url: '/politique-de-confidentialite', kind: 'page' },
+  { title: 'Mentions légales', description: 'Informations légales du site.', url: '/mentions-legales', kind: 'page' },
 ];
+
+type SearchData = {
+  actualites: Awaited<ReturnType<typeof fetchActualites>>;
+  demarches: StrapiRecord[];
+  documents: StrapiRecord[];
+};
+
+async function loadSearchData(signal: AbortSignal): Promise<SearchData> {
+  const [actualites, demarches, documents] = await Promise.all([
+    fetchActualites(signal),
+    getDemarches(signal),
+    getDocuments(signal),
+  ]);
+  return { actualites, demarches, documents };
+}
 
 function normalize(value: string) {
   return value
@@ -46,39 +72,42 @@ export default function Recherche() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q')?.trim() ?? '';
   const normalizedQuery = normalize(query);
-  const results: SearchResult[] = [
-    ...pages,
-    ...news.map((article) => ({
-      title: article.title,
-      description: `${article.category} ${article.summary}`,
-      url: `/actualites/${article.id}`,
-      kind: 'page' as const,
-    })),
-    ...projects.map((project) => ({
-      title: project.title,
-      description: project.summary,
-      url: '/projets',
-      kind: 'page' as const,
-    })),
-    ...services.map((service) => ({
-      title: service.title,
-      description: `${service.description} ${service.requiredDocuments.join(' ')} ${service.processingTime} ${service.cost} ${service.location}`,
-      url: `/services?demarche=${encodeURIComponent(service.id)}`,
-      kind: 'démarche' as const,
-    })),
-    {
-      title: 'Formulaire de démarche (PDF)',
-      description: 'Formulaire à télécharger pour les démarches municipales.',
-      url: '/documents/formulaire-demarche.pdf',
-      kind: 'document PDF' as const,
-    },
-    ...municipalDocuments.map((document) => ({
-      title: document.title,
-      description: `${document.category} ${document.year} ${document.fileName}`,
-      url: `/documents/${document.fileName}`,
-      kind: 'document PDF' as const,
-    })),
-  ]
+  const { data, isLoading, error } = useApiResource(loadSearchData);
+  const dynamicResults: SearchResult[] = data
+    ? [
+        ...data.actualites.map((article) => ({
+          title: article.title,
+          description: `${article.category} ${article.summary}`,
+          url: `/actualites/${article.id}`,
+          kind: 'page' as const,
+        })),
+        ...data.demarches.map((demarche) => {
+          const id = getRecordKey(demarche);
+          return {
+            title: getTextField(demarche, 'Titre', 'Nom') || 'Démarche municipale',
+            description: [
+              getTextField(demarche, 'Description'),
+              getTextField(demarche, 'Pieces'),
+              getTextField(demarche, 'Delai', 'Délai'),
+              getTextField(demarche, 'Cout', 'Coût'),
+              getTextField(demarche, 'Lieu'),
+            ].filter(Boolean).join(' '),
+            url: `/services?demarche=${encodeURIComponent(id)}`,
+            kind: 'démarche' as const,
+          };
+        }),
+        ...data.documents.map((document) => {
+          const fileUrl = getMediaFileUrl(document.Pdf ?? document.FichierPDF ?? document.Fichier);
+          return {
+            title: getTextField(document, 'Titre', 'Nom') || 'Document municipal',
+            description: `${getTextField(document, 'Type', 'TypeDocument')} ${getTextField(document, 'Annee', 'DatePublication')}`,
+            url: fileUrl || '/documents',
+            kind: fileUrl ? 'document PDF' as const : 'page' as const,
+          };
+        }),
+      ]
+    : [];
+  const results: SearchResult[] = [...pages, ...dynamicResults]
     .map((result, index) => ({ result, index, score: scoreResult(normalizedQuery, result) }))
     .filter(({ score }) => normalizedQuery.length > 0 && score > 0)
     .sort((a, b) => b.score - a.score || a.index - b.index)
@@ -92,7 +121,9 @@ export default function Recherche() {
       />
       <section className="wrap py-8" aria-labelledby="search-results-heading">
         <h2 id="search-results-heading" className="sr-only">Résultats de recherche</h2>
-        {query && results.length > 0 ? (
+        {isLoading ? <Loading /> : null}
+        {error ? <ApiError message={error} /> : null}
+        {!isLoading && !error && query && results.length > 0 ? (
           <>
             <p className="mb-4 text-base text-mairie-muted">
               {results.length} résultat{results.length > 1 ? 's' : ''}
@@ -113,13 +144,13 @@ export default function Recherche() {
               ))}
             </ul>
           </>
-        ) : (
+        ) : !isLoading && !error ? (
           <p className="todo-note" role="status">
             {query
               ? 'Aucun résultat trouvé. Essayez un autre terme ou vérifiez l’orthographe.'
               : 'Saisissez un terme pour rechercher dans les pages, les démarches et les documents PDF.'}
           </p>
-        )}
+        ) : null}
       </section>
     </>
   );

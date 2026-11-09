@@ -1,6 +1,10 @@
 import { useState, type FormEvent } from 'react';
+import ApiError from '../components/ApiError';
 import Icon from '../components/Icon';
+import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
+import { getMairieParametres, getTextField } from '../data/api';
+import useApiResource from '../hooks/useApiResource';
 
 const unavailableMessage = 'Cette information sera bientôt disponible.';
 
@@ -8,10 +12,15 @@ const privacyConsent =
   "J'accepte que mes données soient traitées par la Mairie de Bingerville pour répondre à ma demande, conformément à la loi ivoirienne n°2013-450.";
 
 export default function Contact() {
+  const { data: mairie, isLoading, error } = useApiResource(getMairieParametres);
   const [consentGiven, setConsentGiven] = useState(false);
   const [submissionMessage, setSubmissionMessage] = useState('');
   const [submissionFailed, setSubmissionFailed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const address = getTextField(mairie, 'Adresse');
+  const phone = getTextField(mairie, 'Telephone', 'Téléphone');
+  const email = getTextField(mairie, 'Email', 'E-mail');
+  const openingHours = getTextField(mairie, 'HorairesOuverture');
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -155,32 +164,52 @@ export default function Contact() {
           >
             Coordonnées
           </h2>
+          {isLoading ? <Loading /> : null}
+          {error ? <ApiError message={error} /> : null}
+          {!isLoading && !error && (
           <address className="mt-6 space-y-6 text-sm leading-6 not-italic">
             <div className="flex gap-3">
               <Icon name="pin" className="mt-0.5 h-5 w-5 shrink-0 text-mairie-gold" />
               <div>
                 <h3 className="font-semibold">Adresse</h3>
-                <p className="mt-1 text-base">{unavailableMessage}</p>
+                <p className="mt-1 text-base">{address || unavailableMessage}</p>
               </div>
             </div>
             <div className="flex gap-3">
               <Icon name="phone" className="mt-0.5 h-5 w-5 shrink-0 text-mairie-gold" />
               <div>
                 <h3 className="font-semibold">Téléphone</h3>
-                <p className="mt-1 text-base">{unavailableMessage}</p>
+                {phone ? (
+                  <a className="mt-1 inline-flex min-h-11 items-center underline underline-offset-2" href={`tel:${phone.replace(/[^\d+]/g, '')}`}>
+                    {phone}
+                  </a>
+                ) : (
+                  <p className="mt-1 text-base">{unavailableMessage}</p>
+                )}
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Icon name="mail" className="mt-0.5 h-5 w-5 shrink-0 text-mairie-gold" />
+              <div>
+                <h3 className="font-semibold">Adresse e-mail</h3>
+                {email ? (
+                  <a className="mt-1 inline-flex min-h-11 items-center break-all underline underline-offset-2" href={`mailto:${email}`}>
+                    {email}
+                  </a>
+                ) : (
+                  <p className="mt-1 text-base">{unavailableMessage}</p>
+                )}
               </div>
             </div>
             <div className="flex gap-3">
               <Icon name="clock" className="mt-0.5 h-5 w-5 shrink-0 text-mairie-gold" />
               <div>
                 <h3 className="font-semibold">Horaires</h3>
-                <p className="mt-1 text-base">{unavailableMessage}</p>
+                <p className="mt-1 text-base whitespace-pre-line">{openingHours || unavailableMessage}</p>
               </div>
             </div>
           </address>
-          <p className="mt-7 border-t border-white/20 pt-4 text-base leading-6 text-white/90">
-            {unavailableMessage}
-          </p>
+          )}
         </aside>
       </div>
     </>
