@@ -6,7 +6,7 @@ export type Actualite = {
   category: string;
   date: string;
   summary: string;
-  content: string;
+  content: unknown;
   imageUrl: string;
   imageAlt: string;
 };
@@ -14,7 +14,7 @@ export type Actualite = {
 type StrapiActualite = {
   id: number;
   Titre?: string;
-  Contenu?: string | null;
+  Contenu?: unknown;
   DatePublication?: string | null;
   Image?: Array<{
     url?: string | null;
@@ -44,7 +44,7 @@ export async function fetchActualites(signal?: AbortSignal): Promise<Actualite[]
       throw new Error('Une actualité de Strapi ne contient pas de titre.');
     }
 
-    const content = item.Contenu || '';
+    const content = item.Contenu ?? '';
     return {
       id: item.id,
       title: item.Titre,

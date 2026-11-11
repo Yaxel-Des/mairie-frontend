@@ -3,16 +3,16 @@ import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import Icon from '../components/Icon';
 import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
-import { getDecouvrirParametres, getTextField } from '../data/api';
+import { getCmsContentField, getDecouvrirParametres } from '../data/api';
 import useApiResource from '../hooks/useApiResource';
 
 const unavailableMessage = 'Cette information sera bientôt disponible.';
 
 export default function Decouvrir() {
   const { data, isLoading, error } = useApiResource(getDecouvrirParametres);
-  const history = getTextField(data, 'Histoire');
-  const heritage = getTextField(data, 'Patrimoine');
-  const facilities = getTextField(data, 'Equipements');
+  const history = getCmsContentField(data, 'Histoire');
+  const heritage = getCmsContentField(data, 'Patrimoine');
+  const facilities = getCmsContentField(data, 'Equipements');
 
   return (
     <>

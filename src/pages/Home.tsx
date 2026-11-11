@@ -8,6 +8,7 @@ import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import { procedureIcons } from '../components/procedureIcons';
 import {
   getAccueilParametres,
+  getCmsContentField,
   getImageUrl,
   getTextField,
 } from '../data/api';
@@ -54,7 +55,7 @@ export default function Home() {
       return (Number.isNaN(dateB) ? 0 : dateB) - (Number.isNaN(dateA) ? 0 : dateA);
     })
     .slice(0, 3);
-  const mayorMessage = getTextField(accueil, 'MotDuMaire');
+  const mayorMessage = getCmsContentField(accueil, 'MotDuMaire');
   const mayorName = getTextField(accueil, 'NomMaire') || 'Le Maire de Bingerville';
   const mayorPhoto = getImageUrl(accueil?.PhotoMaire);
 

@@ -1,37 +1,13 @@
 import { useId, useState } from 'react';
-import { sanitizeCmsHtml } from '../data/api';
+import { richTextToHtml } from '../data/api';
 
 type ExpandableCmsContentProps = {
-  html: string;
+  html: unknown;
 };
-
-const blockTags = new Set(['BLOCKQUOTE', 'H2', 'H3', 'H4', 'LI', 'OL', 'P', 'UL']);
 
 function getPlainText(html: string): string {
   const document = new DOMParser().parseFromString(html, 'text/html');
-  let text = '';
-
-  const collectText = (node: Node) => {
-    if (node.nodeType === Node.TEXT_NODE) {
-      text += node.textContent ?? '';
-      return;
-    }
-
-    if (!(node instanceof Element)) return;
-    if (node.tagName === 'BR') {
-      text += '\n';
-      return;
-    }
-
-    node.childNodes.forEach(collectText);
-    if (blockTags.has(node.tagName)) text += '\n';
-  };
-
-  document.body.childNodes.forEach(collectText);
-  return text
-    .replace(/[ \t]+\n/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
+  return document.body.textContent?.replace(/\s+/g, ' ').trim() ?? '';
 }
 
 function truncateText(text: string, limit: number): string {
@@ -45,7 +21,8 @@ function truncateText(text: string, limit: number): string {
 export default function ExpandableCmsContent({ html }: ExpandableCmsContentProps) {
   const [expanded, setExpanded] = useState(false);
   const contentId = useId();
-  const plainText = getPlainText(html);
+  const safeHtml = richTextToHtml(html);
+  const plainText = getPlainText(safeHtml);
   const isTruncated = plainText.length > 300;
 
   return (
@@ -54,10 +31,10 @@ export default function ExpandableCmsContent({ html }: ExpandableCmsContentProps
         <div
           id={contentId}
           className="cms-content mx-0 max-w-prose"
-          dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(html) }}
+          dangerouslySetInnerHTML={{ __html: safeHtml }}
         />
       ) : (
-        <p id={contentId} className="whitespace-pre-line text-base leading-relaxed text-mairie-ink">
+        <p id={contentId} className="text-base leading-relaxed text-mairie-ink">
           {truncateText(plainText, 300)}
         </p>
       )}

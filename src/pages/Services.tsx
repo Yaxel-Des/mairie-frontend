@@ -4,74 +4,11 @@ import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import Icon from '../components/Icon';
 import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
-import { getDemarches, getMediaFileUrl, getRecordKey, getTextField, sanitizeCmsHtml } from '../data/api';
+import { getCmsContentField, getDemarches, getMediaFileUrl, getRecordKey, getTextField } from '../data/api';
 import { procedureIcons } from '../components/procedureIcons';
 import useApiResource from '../hooks/useApiResource';
 
 const unavailableMessage = 'Cette information sera bientôt disponible.';
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function getRichTextHtml(value: unknown): string {
-  if (typeof value === 'string') return sanitizeCmsHtml(value);
-  if (!Array.isArray(value)) return '';
-
-  const renderInline = (node: unknown): string => {
-    if (Array.isArray(node)) return node.map(renderInline).join('');
-    if (!node || typeof node !== 'object') return '';
-
-    if ('text' in node && typeof node.text === 'string') {
-      let text = escapeHtml(node.text);
-      if ('italic' in node && node.italic === true) text = `<em>${text}</em>`;
-      if ('bold' in node && node.bold === true) text = `<strong>${text}</strong>`;
-      return text;
-    }
-
-    if (!('children' in node) || !Array.isArray(node.children)) return '';
-    const children = node.children.map(renderInline).join('');
-
-    if ('type' in node && node.type === 'link' && 'url' in node && typeof node.url === 'string') {
-      return `<a href="${escapeHtml(node.url)}">${children}</a>`;
-    }
-
-    return children;
-  };
-
-  const renderBlock = (block: unknown): string => {
-    if (!block || typeof block !== 'object' || !('children' in block) || !Array.isArray(block.children)) {
-      return '';
-    }
-
-    const children = block.children;
-    const content = children.map(renderInline).join('');
-    if (!('type' in block) || typeof block.type !== 'string') return content;
-
-    switch (block.type) {
-      case 'paragraph':
-        return `<p>${content}</p>`;
-      case 'heading':
-        return `<h${'level' in block && block.level === 2 ? '2' : '3'}>${content}</h${'level' in block && block.level === 2 ? '2' : '3'}>`;
-      case 'list': {
-        const tag = 'format' in block && block.format === 'ordered' ? 'ol' : 'ul';
-        const items = children.map((item) => `<li>${renderInline(item)}</li>`).join('');
-        return `<${tag}>${items}</${tag}>`;
-      }
-      case 'quote':
-        return `<blockquote>${content}</blockquote>`;
-      default:
-        return content;
-    }
-  };
-
-  return sanitizeCmsHtml(value.map(renderBlock).join(''));
-}
 
 export default function Services() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -83,8 +20,8 @@ export default function Services() {
     null;
   const selectedId = selectedService ? getRecordKey(selectedService) : '';
   const requiredDocuments = selectedService
-    ? getRichTextHtml(selectedService.Pieces ?? selectedService.PiecesAFournir ?? selectedService.DocumentsRequis)
-    : '';
+    ? selectedService.Pieces ?? selectedService.PiecesAFournir ?? selectedService.DocumentsRequis
+    : null;
   const pdfUrl = selectedService
     ? getMediaFileUrl(selectedService.Pdf ?? selectedService.FichierPDF ?? selectedService.Fichier)
     : null;
@@ -150,7 +87,7 @@ export default function Services() {
                     </h2>
                     <div className="mt-2">
                       <ExpandableCmsContent
-                        html={getTextField(selectedService, 'Description') || unavailableMessage}
+                        html={getCmsContentField(selectedService, 'Description') || unavailableMessage}
                       />
                     </div>
                   </div>

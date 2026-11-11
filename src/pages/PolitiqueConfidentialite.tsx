@@ -2,7 +2,7 @@ import ApiError from '../components/ApiError';
 import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
-import { getPageLegale, getTextField } from '../data/api';
+import { getCmsContentField, getPageLegale } from '../data/api';
 import useApiResource from '../hooks/useApiResource';
 
 const unavailableMessage = 'Cette information sera bientôt disponible.';
@@ -45,7 +45,7 @@ export default function PolitiqueConfidentialite() {
         {error ? <ApiError message={error} /> : null}
 
         {!isLoading && !error && privacySections.map((section) => {
-          const content = getTextField(data, ...section.fields);
+          const content = getCmsContentField(data, ...section.fields);
           return (
           <section
             key={section.id}

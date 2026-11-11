@@ -2,7 +2,7 @@ import ApiError from '../components/ApiError';
 import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
-import { getProjets, getProjetsParametres, getTextField } from '../data/api';
+import { getCmsContentField, getProjets, getProjetsParametres, getTextField } from '../data/api';
 import useApiResource from '../hooks/useApiResource';
 
 const unavailableMessage = 'Cette information sera bientôt disponible.';
@@ -23,7 +23,7 @@ async function loadProjets(signal: AbortSignal) {
 export default function Projets() {
   const { data, isLoading, error } = useApiResource(loadProjets);
   const projects = data?.projects ?? [];
-  const introduction = getTextField(data?.settings ?? null, 'Introduction');
+  const introduction = getCmsContentField(data?.settings ?? null, 'Introduction');
 
   return (
     <>
@@ -42,9 +42,9 @@ export default function Projets() {
                 <ExpandableCmsContent html={introduction} />
               </div>
             )}
-            {getTextField(data?.settings ?? null, 'TexteInvestir') && (
+            {getCmsContentField(data?.settings ?? null, 'TexteInvestir') && (
               <div className="mb-8">
-                <ExpandableCmsContent html={getTextField(data?.settings ?? null, 'TexteInvestir')} />
+                <ExpandableCmsContent html={getCmsContentField(data?.settings ?? null, 'TexteInvestir')} />
               </div>
             )}
             {projects.length ? (
@@ -52,7 +52,7 @@ export default function Projets() {
                 {projects.map((project) => {
                   const status = getTextField(project, 'Statut');
                   const border = statusStyle[status] ?? 'border-mairie-line';
-                  const description = getTextField(project, 'Description');
+                  const description = getCmsContentField(project, 'Description');
                   return (
                     <li key={project.documentId || project.id} className={`card border-l-4 ${border} p-5 sm:p-6`}>
                       <article>

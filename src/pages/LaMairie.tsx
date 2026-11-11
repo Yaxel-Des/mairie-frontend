@@ -4,6 +4,7 @@ import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
 import {
   getAdjoints,
+  getCmsContentField,
   getImageUrl,
   getMairieParametres,
   getTextField,
@@ -52,9 +53,9 @@ export default function LaMairie() {
   const { data, isLoading, error } = useApiResource(loadMairie);
   const mairie = data?.mairie ?? null;
   const adjoints = data?.adjoints ?? [];
-  const presentation = getTextField(mairie, 'Presentation');
-  const history = getTextField(mairie, 'Histoire');
-  const organization = getTextField(mairie, 'Organigramme');
+  const presentation = getCmsContentField(mairie, 'Presentation');
+  const history = getCmsContentField(mairie, 'Histoire');
+  const organization = getCmsContentField(mairie, 'Organigramme');
   const council = getCouncilHtml(mairie?.ConseilMunicipal);
 
   return (

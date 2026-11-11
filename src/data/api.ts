@@ -123,6 +123,16 @@ export function getTextField(record: StrapiRecord | null, ...keys: string[]): st
   return '';
 }
 
+export function getCmsContentField(record: StrapiRecord | null, ...keys: string[]): unknown {
+  if (!record) return null;
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === 'string' && value.trim()) return value;
+    if (Array.isArray(value) && value.length > 0) return value;
+  }
+  return null;
+}
+
 export function getRecordKey(record: StrapiRecord): string {
   return record.documentId || String(record.id);
 }
@@ -176,7 +186,89 @@ export function sanitizeCmsHtml(html: string): string {
   return Array.from(parsed.body.childNodes, cleanNode).join('');
 }
 
+function escapeCmsText(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function renderCmsInline(node: unknown): string {
+  if (Array.isArray(node)) return node.map(renderCmsInline).join('');
+  if (!node || typeof node !== 'object') return '';
+
+  if ('text' in node && typeof node.text === 'string') {
+    let text = escapeCmsText(node.text);
+    if ('italic' in node && node.italic === true) text = `<em>${text}</em>`;
+    if ('bold' in node && node.bold === true) text = `<strong>${text}</strong>`;
+    return text;
+  }
+
+  if (!('children' in node) || !Array.isArray(node.children)) return '';
+  const children = node.children.map(renderCmsInline).join('');
+  if ('type' in node && node.type === 'link' && 'url' in node && typeof node.url === 'string') {
+    return `<a href="${escapeCmsText(node.url)}">${children}</a>`;
+  }
+  return children;
+}
+
+function renderCmsBlock(block: unknown): string {
+  if (!block || typeof block !== 'object' || !('children' in block) || !Array.isArray(block.children)) {
+    return '';
+  }
+
+  const children = block.children;
+  const content = children.map(renderCmsInline).join('');
+  if (!('type' in block) || typeof block.type !== 'string') return `<p>${content}</p>`;
+
+  switch (block.type) {
+    case 'paragraph':
+      return `<p>${content}</p>`;
+    case 'heading': {
+      const level = 'level' in block && (block.level === 2 || block.level === 3 || block.level === 4)
+        ? block.level
+        : 3;
+      return `<h${level}>${content}</h${level}>`;
+    }
+    case 'list': {
+      const tag = 'format' in block && block.format === 'ordered' ? 'ol' : 'ul';
+      const items = children.map((item) => {
+        if (item && typeof item === 'object' && 'children' in item && Array.isArray(item.children)) {
+          return `<li>${item.children.map(renderCmsInline).join('')}</li>`;
+        }
+        return `<li>${renderCmsInline(item)}</li>`;
+      }).join('');
+      return `<${tag}>${items}</${tag}>`;
+    }
+    case 'list-item':
+      return `<li>${content}</li>`;
+    case 'quote':
+      return `<blockquote>${content}</blockquote>`;
+    default:
+      return `<p>${content}</p>`;
+  }
+}
+
+export function richTextToHtml(value: unknown): string {
+  if (Array.isArray(value)) {
+    return sanitizeCmsHtml(value.map(renderCmsBlock).join(''));
+  }
+  if (typeof value !== 'string' || !value.trim()) return '';
+
+  if (/<\/?[a-z][\s\S]*>/i.test(value)) return sanitizeCmsHtml(value);
+
+  const paragraphs = value
+    .trim()
+    .split(/\n\s*\n/)
+    .map((paragraph) => paragraph.trim().replace(/\s*\n\s*/g, ' '));
+  return sanitizeCmsHtml(paragraphs.map((paragraph) => `<p>${escapeCmsText(paragraph)}</p>`).join(''));
+}
+
 export function richTextToPlainText(value: unknown): string {
-  if (typeof value !== 'string') return '';
-  return new DOMParser().parseFromString(value, 'text/html').body.textContent?.trim() ?? '';
+  const html = richTextToHtml(value);
+  if (!html) return '';
+  return new DOMParser()
+    .parseFromString(html, 'text/html')
+    .body.textContent?.replace(/\s+/g, ' ')
+    .trim() ?? '';
 }
