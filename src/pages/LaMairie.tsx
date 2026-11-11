@@ -7,7 +7,6 @@ import {
   getImageUrl,
   getMairieParametres,
   getTextField,
-  sanitizeCmsHtml,
   type StrapiRecord,
 } from '../data/api';
 import useApiResource from '../hooks/useApiResource';
@@ -23,8 +22,17 @@ async function loadMairie(signal: AbortSignal) {
   return { mairie, adjoints };
 }
 
-function getCouncilMembers(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function getCouncilHtml(value: unknown): string {
+  if (!Array.isArray(value)) return '';
 
   const getText = (node: unknown): string => {
     if (!node || typeof node !== 'object') return '';
@@ -35,7 +43,9 @@ function getCouncilMembers(value: unknown): string[] {
     return '';
   };
 
-  return value.map(getText).map((text) => text.trim()).filter(Boolean);
+  const members = value.map(getText).map((text) => text.trim()).filter(Boolean);
+  if (members.length === 0) return '';
+  return `<ul>${members.map((member) => `<li>${escapeHtml(member)}</li>`).join('')}</ul>`;
 }
 
 export default function LaMairie() {
@@ -45,7 +55,7 @@ export default function LaMairie() {
   const presentation = getTextField(mairie, 'Presentation');
   const history = getTextField(mairie, 'Histoire');
   const organization = getTextField(mairie, 'Organigramme');
-  const council = getCouncilMembers(mairie?.ConseilMunicipal);
+  const council = getCouncilHtml(mairie?.ConseilMunicipal);
 
   return (
     <>
@@ -76,10 +86,7 @@ export default function LaMairie() {
               Histoire
             </h2>
             {history ? (
-              <div
-                className="cms-content mt-4"
-                dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(history) }}
-              />
+              <div className="mt-4"><ExpandableCmsContent html={history} /></div>
             ) : (
               <p className="mt-3 text-base text-mairie-muted">{unavailableMessage}</p>
             )}
@@ -90,14 +97,10 @@ export default function LaMairie() {
           <h2 id="council-heading" className="font-serif text-2xl font-semibold text-mairie-brown">
             Le Conseil Municipal
           </h2>
-          {council.length ? (
-            <ul className="card mt-4 divide-y divide-mairie-line overflow-hidden">
-              {council.map((member, index) => (
-                <li key={`${member}-${index}`} className="px-5 py-4 text-base text-mairie-ink">
-                  {member}
-                </li>
-              ))}
-            </ul>
+          {council ? (
+            <div className="card mt-4 p-5 sm:p-6">
+              <ExpandableCmsContent html={council} />
+            </div>
           ) : (
             <p className="mt-3 text-base text-mairie-muted">{unavailableMessage}</p>
           )}
@@ -108,10 +111,7 @@ export default function LaMairie() {
             L’Organigramme
           </h2>
           {organization ? (
-            <div
-              className="cms-content mt-4"
-              dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(organization) }}
-            />
+            <div className="mt-4"><ExpandableCmsContent html={organization} /></div>
           ) : (
             <p className="mt-3 text-base text-mairie-muted">{unavailableMessage}</p>
           )}

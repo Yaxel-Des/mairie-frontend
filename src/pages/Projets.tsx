@@ -2,7 +2,7 @@ import ApiError from '../components/ApiError';
 import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
-import { getProjets, getProjetsParametres, getTextField, richTextToPlainText, sanitizeCmsHtml } from '../data/api';
+import { getProjets, getProjetsParametres, getTextField } from '../data/api';
 import useApiResource from '../hooks/useApiResource';
 
 const unavailableMessage = 'Cette information sera bientôt disponible.';
@@ -29,7 +29,7 @@ export default function Projets() {
     <>
       <PageHeader
         title="Projets communaux"
-        intro={richTextToPlainText(introduction) || unavailableMessage}
+        intro="Découvrez les projets communaux et leur état d’avancement."
       />
 
       <div className="wrap py-10">
@@ -37,13 +37,15 @@ export default function Projets() {
         {error ? <ApiError message={error} /> : null}
         {!isLoading && !error && (
           <>
+            {introduction && (
+              <div className="mb-8">
+                <ExpandableCmsContent html={introduction} />
+              </div>
+            )}
             {getTextField(data?.settings ?? null, 'TexteInvestir') && (
-              <div
-                className="cms-content mb-8"
-                dangerouslySetInnerHTML={{
-                  __html: sanitizeCmsHtml(getTextField(data?.settings ?? null, 'TexteInvestir')),
-                }}
-              />
+              <div className="mb-8">
+                <ExpandableCmsContent html={getTextField(data?.settings ?? null, 'TexteInvestir')} />
+              </div>
             )}
             {projects.length ? (
               <ul className="space-y-4">

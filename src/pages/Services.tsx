@@ -176,10 +176,9 @@ export default function Services() {
               <div className="px-6 py-6 sm:px-8">
                 <h3 className="font-serif text-lg font-semibold text-mairie-brown">Pièces à fournir</h3>
                 {requiredDocuments ? (
-                  <div
-                    className="cms-content mt-3 space-y-3 [&_h2]:text-lg [&_ul]:pl-6 [&_ol]:pl-6 [&_li]:ml-6"
-                    dangerouslySetInnerHTML={{ __html: requiredDocuments }}
-                  />
+                  <div className="mt-3">
+                    <ExpandableCmsContent html={requiredDocuments} />
+                  </div>
                 ) : (
                   <p className="mt-3 text-base text-mairie-muted">{unavailableMessage}</p>
                 )}
