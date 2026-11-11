@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../components/Icon';
 import LagoonArch from '../components/LagoonArch';
-import Loading from '../components/Loading';
 import ApiError from '../components/ApiError';
 import ExpandableCmsContent from '../components/ExpandableCmsContent';
+import LoadingSkeleton from '../components/LoadingSkeleton';
 import { procedureIcons } from '../components/procedureIcons';
 import {
   getAccueilParametres,
@@ -142,7 +142,7 @@ export default function Home() {
           </div>
           <div className="border-l-4 border-mairie-gold pl-5 sm:pl-7">
             {isAccueilLoading ? (
-              <Loading />
+              <LoadingSkeleton variant="content" count={1} />
             ) : accueilError ? (
               <ApiError message={accueilError} />
             ) : (
@@ -192,7 +192,7 @@ export default function Home() {
           </div>
 
           {isNewsLoading ? (
-            <div className="mt-8"><Loading /></div>
+            <div className="mt-8"><LoadingSkeleton variant="cards" count={3} /></div>
           ) : newsError ? (
             <p className="todo-note mt-8" role="alert">{newsError}</p>
           ) : latestNews.length === 0 ? (

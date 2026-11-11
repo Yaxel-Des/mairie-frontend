@@ -1,6 +1,6 @@
 import ApiError from '../components/ApiError';
 import ExpandableCmsContent from '../components/ExpandableCmsContent';
-import Loading from '../components/Loading';
+import LoadingSkeleton from '../components/LoadingSkeleton';
 import PageHeader from '../components/PageHeader';
 import {
   getAdjoints,
@@ -66,7 +66,12 @@ export default function LaMairie() {
       />
 
       <div className="wrap space-y-12 py-10">
-        {isLoading ? <Loading /> : error ? <ApiError message={error} /> : null}
+        {isLoading ? (
+          <LoadingSkeleton count={4} />
+        ) : error ? (
+          <ApiError message={error} />
+        ) : (
+          <>
 
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
           <section aria-labelledby="presentation-heading">
@@ -150,6 +155,8 @@ export default function LaMairie() {
             <p className="mt-3 text-base text-mairie-muted">{unavailableMessage}</p>
           ) : null}
         </section>
+          </>
+        )}
       </div>
     </>
   );

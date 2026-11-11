@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../components/Icon';
+import LoadingSkeleton from '../components/LoadingSkeleton';
 import PageHeader from '../components/PageHeader';
 import { fetchActualites, truncateSummary, type Actualite } from '../data/actualitesApi';
 
@@ -39,7 +40,7 @@ export default function Actualites() {
 
       <div className="wrap py-10">
         {isLoading ? (
-          <p role="status">Chargement...</p>
+          <LoadingSkeleton variant="cards" count={6} />
         ) : errorMessage ? (
           <p className="todo-note" role="alert">{errorMessage}</p>
         ) : news.length === 0 ? (

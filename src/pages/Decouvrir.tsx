@@ -1,7 +1,7 @@
 import ApiError from '../components/ApiError';
 import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import Icon from '../components/Icon';
-import Loading from '../components/Loading';
+import LoadingSkeleton from '../components/LoadingSkeleton';
 import PageHeader from '../components/PageHeader';
 import { getCmsContentField, getDecouvrirParametres } from '../data/api';
 import useApiResource from '../hooks/useApiResource';
@@ -22,7 +22,12 @@ export default function Decouvrir() {
       />
 
       <div className="wrap space-y-12 py-10">
-        {isLoading ? <Loading /> : error ? <ApiError message={error} /> : null}
+        {isLoading ? (
+          <LoadingSkeleton count={3} />
+        ) : error ? (
+          <ApiError message={error} />
+        ) : (
+          <>
 
         <section aria-labelledby="history-heading">
           <h2 id="history-heading" className="flex items-center gap-3 font-serif text-2xl font-semibold text-mairie-brown">
@@ -64,6 +69,8 @@ export default function Decouvrir() {
             </p>
           )}
         </section>
+          </>
+        )}
       </div>
     </>
   );

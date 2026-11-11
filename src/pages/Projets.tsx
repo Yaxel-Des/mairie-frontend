@@ -1,6 +1,6 @@
 import ApiError from '../components/ApiError';
 import ExpandableCmsContent from '../components/ExpandableCmsContent';
-import Loading from '../components/Loading';
+import LoadingSkeleton from '../components/LoadingSkeleton';
 import PageHeader from '../components/PageHeader';
 import { getCmsContentField, getProjets, getProjetsParametres, getTextField } from '../data/api';
 import useApiResource from '../hooks/useApiResource';
@@ -33,9 +33,11 @@ export default function Projets() {
       />
 
       <div className="wrap py-10">
-        {isLoading ? <Loading /> : null}
-        {error ? <ApiError message={error} /> : null}
-        {!isLoading && !error && (
+        {isLoading ? (
+          <LoadingSkeleton count={4} />
+        ) : error ? (
+          <ApiError message={error} />
+        ) : (
           <>
             {introduction && (
               <div className="mb-8">
