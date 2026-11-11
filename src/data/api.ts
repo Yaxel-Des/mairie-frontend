@@ -186,6 +186,13 @@ export function sanitizeCmsHtml(html: string): string {
   return Array.from(parsed.body.childNodes, cleanNode).join('');
 }
 
+export function getCmsMarkdown(value: unknown): string | null {
+  if (typeof value !== 'string' || !value.trim() || /<\/?[a-z][\s\S]*>/i.test(value)) {
+    return null;
+  }
+  return value;
+}
+
 function escapeCmsText(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -265,6 +272,20 @@ export function richTextToHtml(value: unknown): string {
 }
 
 export function richTextToPlainText(value: unknown): string {
+  const markdown = getCmsMarkdown(value);
+  if (markdown !== null) {
+    return markdown
+      .replace(/```[\s\S]*?```/g, (code) => code.replace(/^```[^\n]*\n?|```$/g, ''))
+      .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/^ {0,3}#{1,6}\s+/gm, '')
+      .replace(/^ {0,3}(?:[-+*]|\d+[.)])\s+/gm, '')
+      .replace(/^ {0,3}>\s?/gm, '')
+      .replace(/(\*\*|__|~~|`)(.*?)\1/g, '$2')
+      .replace(/(?<!\w)([*_])([^*_]+)\1(?!\w)/g, '$2')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
   const html = richTextToHtml(value);
   if (!html) return '';
   return new DOMParser()

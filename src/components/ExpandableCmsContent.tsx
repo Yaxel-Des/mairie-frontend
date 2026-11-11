@@ -1,14 +1,10 @@
 import { useId, useState } from 'react';
-import { richTextToHtml } from '../data/api';
+import ReactMarkdown from 'react-markdown';
+import { getCmsMarkdown, richTextToHtml, richTextToPlainText } from '../data/api';
 
 type ExpandableCmsContentProps = {
   html: unknown;
 };
-
-function getPlainText(html: string): string {
-  const document = new DOMParser().parseFromString(html, 'text/html');
-  return document.body.textContent?.replace(/\s+/g, ' ').trim() ?? '';
-}
 
 function truncateText(text: string, limit: number): string {
   const cutoff = Math.max(0, limit - 3);
@@ -21,18 +17,30 @@ function truncateText(text: string, limit: number): string {
 export default function ExpandableCmsContent({ html }: ExpandableCmsContentProps) {
   const [expanded, setExpanded] = useState(false);
   const contentId = useId();
+  const markdown = getCmsMarkdown(html);
   const safeHtml = richTextToHtml(html);
-  const plainText = getPlainText(safeHtml);
+  const plainText = richTextToPlainText(html);
   const isTruncated = plainText.length > 300;
 
   return (
     <div className="max-w-prose">
       {expanded || !isTruncated ? (
-        <div
-          id={contentId}
-          className="cms-content mx-0 max-w-prose"
-          dangerouslySetInnerHTML={{ __html: safeHtml }}
-        />
+        <div id={contentId} className="cms-content mx-0 max-w-prose">
+          {markdown !== null ? (
+            <ReactMarkdown
+              components={{
+                h1: ({ children }) => <h2>{children}</h2>,
+                h2: ({ children }) => <h2>{children}</h2>,
+                h3: ({ children }) => <h3>{children}</h3>,
+                h4: ({ children }) => <h4>{children}</h4>,
+              }}
+            >
+              {markdown}
+            </ReactMarkdown>
+          ) : (
+            <div dangerouslySetInnerHTML={{ __html: safeHtml }} />
+          )}
+        </div>
       ) : (
         <p id={contentId} className="text-base leading-relaxed text-mairie-ink">
           {truncateText(plainText, 300)}
