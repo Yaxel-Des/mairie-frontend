@@ -3,7 +3,12 @@ import { Link } from 'react-router-dom';
 import Icon from '../components/Icon';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import PageHeader from '../components/PageHeader';
-import { fetchActualites, truncateSummary, type Actualite } from '../data/actualitesApi';
+import {
+  fetchActualites,
+  formatPublicationDate,
+  truncateSummary,
+  type Actualite,
+} from '../data/actualitesApi';
 
 export default function Actualites() {
   const [news, setNews] = useState<Actualite[]>([]);
@@ -66,7 +71,7 @@ export default function Actualites() {
                       <span className="rounded-full bg-mairie-lagoonSoft px-2.5 py-1 text-mairie-lagoonDeep">
                         {item.category}
                       </span>
-                      <span className="todo-note px-2.5 py-1">{item.date}</span>
+                      <span className="todo-note px-2.5 py-1">{formatPublicationDate(item.date)}</span>
                     </div>
                     <h2 className="mt-3 font-serif text-xl font-semibold leading-snug text-mairie-brown">
                       {item.title}

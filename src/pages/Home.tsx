@@ -12,7 +12,12 @@ import {
   getImageUrl,
   getTextField,
 } from '../data/api';
-import { fetchActualites, truncateSummary, type Actualite } from '../data/actualitesApi';
+import {
+  fetchActualites,
+  formatPublicationDate,
+  truncateSummary,
+  type Actualite,
+} from '../data/actualitesApi';
 import { quickLinks } from '../data/mockData';
 import useApiResource from '../hooks/useApiResource';
 
@@ -215,7 +220,7 @@ export default function Home() {
                       {item.category}
                     </span>
                     <p className="todo-note inline-block px-2.5 py-1 font-semibold">
-                      {item.date}
+                      {formatPublicationDate(item.date)}
                     </p>
                     <h3 className="mt-3 font-serif text-xl font-semibold leading-snug text-mairie-brown">
                       {item.title}

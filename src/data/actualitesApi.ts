@@ -33,6 +33,27 @@ export function truncateSummary(summary: string, maxLength = 150): string {
   return `${normalizedSummary.slice(0, maxLength - 3).trimEnd()}...`;
 }
 
+export function formatPublicationDate(date: string | null | undefined): string {
+  if (!date?.trim()) return 'Date non spécifiée';
+
+  const parsedDate = new Date(date);
+  if (Number.isNaN(parsedDate.getTime())) return 'Date non spécifiée';
+
+  const parts = new Intl.DateTimeFormat('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+    timeZone: 'Africa/Abidjan',
+  }).formatToParts(parsedDate);
+  const value = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? '';
+
+  return `${value('day')} ${value('month')} ${value('year')} à ${value('hour')}h${value('minute')}`;
+}
+
 export async function fetchActualites(signal?: AbortSignal): Promise<Actualite[]> {
   const result = await fetchApiData<StrapiActualite[]>('/api/actualites?populate=*', signal);
   if (!Array.isArray(result)) {
@@ -49,7 +70,7 @@ export async function fetchActualites(signal?: AbortSignal): Promise<Actualite[]
       id: item.id,
       title: item.Titre,
       category: item.category?.Nom || 'Actualité',
-      date: item.DatePublication || 'Date à compléter',
+      date: item.DatePublication || '',
       summary: richTextToPlainText(content) || item.Titre,
       content,
       imageUrl: item.Image?.[0] ? getImageUrl(item.Image) : actualitePlaceholder,
