@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import ApiError from '../components/ApiError';
+import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import Icon from '../components/Icon';
 import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
@@ -147,9 +148,11 @@ export default function Services() {
                     >
                       {getTextField(selectedService, 'Titre', 'Nom') || unavailableMessage}
                     </h2>
-                    <p className="mt-2 text-base leading-7 text-mairie-muted">
-                      {getTextField(selectedService, 'Description') || unavailableMessage}
-                    </p>
+                    <div className="mt-2">
+                      <ExpandableCmsContent
+                        html={getTextField(selectedService, 'Description') || unavailableMessage}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

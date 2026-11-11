@@ -1,7 +1,8 @@
 import ApiError from '../components/ApiError';
+import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
-import { getPageLegale, getTextField, sanitizeCmsHtml } from '../data/api';
+import { getPageLegale, getTextField } from '../data/api';
 import useApiResource from '../hooks/useApiResource';
 
 const unavailableMessage = 'Cette information sera bientôt disponible.';
@@ -63,12 +64,9 @@ export default function MentionsLegales() {
                   {section.title}
                 </h2>
                 {getTextField(data, ...section.fields) ? (
-                  <div
-                    className="cms-content mt-3"
-                    dangerouslySetInnerHTML={{
-                      __html: sanitizeCmsHtml(getTextField(data, ...section.fields)),
-                    }}
-                  />
+                  <div className="mt-3">
+                    <ExpandableCmsContent html={getTextField(data, ...section.fields)} />
+                  </div>
                 ) : (
                   <p className="mt-3 text-base leading-7 text-mairie-ink">{unavailableMessage}</p>
                 )}

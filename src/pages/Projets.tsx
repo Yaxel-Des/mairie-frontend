@@ -1,4 +1,5 @@
 import ApiError from '../components/ApiError';
+import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
 import { getProjets, getProjetsParametres, getTextField, richTextToPlainText, sanitizeCmsHtml } from '../data/api';
@@ -57,10 +58,9 @@ export default function Projets() {
                           {getTextField(project, 'Titre')}
                         </h2>
                         {description ? (
-                          <div
-                            className="cms-content mt-2"
-                            dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(description) }}
-                          />
+                          <div className="mt-2">
+                            <ExpandableCmsContent html={description} />
+                          </div>
                         ) : (
                           <p className="mt-2 text-base text-mairie-muted">{unavailableMessage}</p>
                         )}

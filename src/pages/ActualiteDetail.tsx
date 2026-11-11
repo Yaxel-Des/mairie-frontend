@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import Icon from '../components/Icon';
 import PageHeader from '../components/PageHeader';
 import { fetchActualites, type Actualite } from '../data/actualitesApi';
@@ -87,9 +88,7 @@ export default function ActualiteDetail() {
             height="480"
           />
           <div className="mt-6 rounded-lg border border-mairie-line bg-white p-5 sm:p-7">
-            <p className="whitespace-pre-line text-base leading-7 text-mairie-ink">
-              {article.content || article.summary}
-            </p>
+            <ExpandableCmsContent html={article.content || article.summary} />
           </div>
 
           <section aria-labelledby="share-article-heading" className="mt-7">

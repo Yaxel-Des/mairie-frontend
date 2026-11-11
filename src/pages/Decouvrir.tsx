@@ -1,8 +1,9 @@
 import ApiError from '../components/ApiError';
+import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import Icon from '../components/Icon';
 import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
-import { getDecouvrirParametres, getTextField, sanitizeCmsHtml } from '../data/api';
+import { getDecouvrirParametres, getTextField } from '../data/api';
 import useApiResource from '../hooks/useApiResource';
 
 const unavailableMessage = 'Cette information sera bientôt disponible.';
@@ -29,10 +30,7 @@ export default function Decouvrir() {
             Histoire de Bingerville
           </h2>
           {history ? (
-            <div
-              className="cms-content mt-4"
-              dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(history) }}
-            />
+            <div className="mt-4"><ExpandableCmsContent html={history} /></div>
           ) : (
             <p className="mt-4 max-w-3xl text-base text-mairie-muted">
               {unavailableMessage}
@@ -45,10 +43,7 @@ export default function Decouvrir() {
             Patrimoine
           </h2>
           {heritage ? (
-            <div
-              className="cms-content mt-4"
-              dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(heritage) }}
-            />
+            <div className="mt-4"><ExpandableCmsContent html={heritage} /></div>
           ) : (
             <p className="mt-3 text-base text-mairie-muted">
               {unavailableMessage}
@@ -62,10 +57,7 @@ export default function Decouvrir() {
             Équipements et lieux de visite
           </h2>
           {facilities ? (
-            <div
-              className="cms-content mt-4"
-              dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(facilities) }}
-            />
+            <div className="mt-4"><ExpandableCmsContent html={facilities} /></div>
           ) : (
             <p className="mt-3 text-base text-mairie-muted">
               {unavailableMessage}
