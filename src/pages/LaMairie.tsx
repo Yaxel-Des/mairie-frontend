@@ -1,4 +1,5 @@
 import ApiError from '../components/ApiError';
+import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
 import {
@@ -10,6 +11,7 @@ import {
   type StrapiRecord,
 } from '../data/api';
 import useApiResource from '../hooks/useApiResource';
+
 
 const unavailableMessage = 'Cette information sera bientôt disponible.';
 
@@ -61,10 +63,9 @@ export default function LaMairie() {
               Présentation de la Mairie
             </h2>
             {presentation ? (
-              <div
-                className="cms-content mt-4"
-                dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(presentation) }}
-              />
+              <div className="mt-4">
+                <ExpandableCmsContent html={presentation} />
+              </div>
             ) : (
               <p className="mt-3 text-base text-mairie-muted">{unavailableMessage}</p>
             )}

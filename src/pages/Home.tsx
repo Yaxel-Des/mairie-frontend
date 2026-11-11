@@ -4,16 +4,17 @@ import Icon from '../components/Icon';
 import LagoonArch from '../components/LagoonArch';
 import Loading from '../components/Loading';
 import ApiError from '../components/ApiError';
+import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import { procedureIcons } from '../components/procedureIcons';
 import {
   getAccueilParametres,
   getImageUrl,
   getTextField,
-  sanitizeCmsHtml,
 } from '../data/api';
 import { fetchActualites, truncateSummary, type Actualite } from '../data/actualitesApi';
 import { quickLinks } from '../data/mockData';
 import useApiResource from '../hooks/useApiResource';
+
 
 export default function Home() {
   const {
@@ -147,10 +148,7 @@ export default function Home() {
               <div className="grid gap-6 sm:grid-cols-[minmax(0,1fr)_12rem]">
                 <div>
                   {mayorMessage ? (
-                    <div
-                      className="cms-content mx-0 max-w-2xl whitespace-pre-line"
-                      dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(mayorMessage) }}
-                    />
+                    <ExpandableCmsContent html={mayorMessage} />
                   ) : (
                     <p className="text-base text-mairie-muted">Cette information sera bientôt disponible.</p>
                   )}
