@@ -101,30 +101,38 @@ export function getImageUrl(
   return getMediaUrl(imageArray) ?? actualitePlaceholder;
 }
 
-export function getMediaUrl(value: unknown): string | null {
-  let media = value;
-  while (true) {
-    if (Array.isArray(media)) {
-      media = media[0];
-      continue;
-    }
-    if (!media || typeof media !== 'object') return null;
-    if ('url' in media && typeof media.url === 'string' && media.url.trim()) {
-      const url = media.url.trim();
-      if (/^https?:\/\//i.test(url)) return url;
-      if (url.startsWith('//')) return `https:${url}`;
-      return `${apiOrigin ?? ''}${url.startsWith('/') ? '' : '/'}${url}`;
-    }
-    if ('data' in media) {
-      media = media.data;
-      continue;
-    }
-    if ('attributes' in media) {
-      media = media.attributes;
-      continue;
-    }
-    return null;
+export type CmsMediaItem = {
+  url: string;
+  alternativeText: string;
+};
+
+function resolveMediaUrl(url: string): string {
+  const normalizedUrl = url.trim();
+  if (/^https?:\/\//i.test(normalizedUrl)) return normalizedUrl;
+  if (normalizedUrl.startsWith('//')) return `https:${normalizedUrl}`;
+  return `${apiOrigin ?? ''}${normalizedUrl.startsWith('/') ? '' : '/'}${normalizedUrl}`;
+}
+
+export function getMediaItems(value: unknown): CmsMediaItem[] {
+  if (Array.isArray(value)) return value.flatMap(getMediaItems);
+  if (!value || typeof value !== 'object') return [];
+
+  if ('url' in value && typeof value.url === 'string' && value.url.trim()) {
+    return [{
+      url: resolveMediaUrl(value.url),
+      alternativeText: 'alternativeText' in value && typeof value.alternativeText === 'string'
+        ? value.alternativeText
+        : '',
+    }];
   }
+
+  if ('data' in value) return getMediaItems(value.data);
+  if ('attributes' in value) return getMediaItems(value.attributes);
+  return [];
+}
+
+export function getMediaUrl(value: unknown): string | null {
+  return getMediaItems(value)[0]?.url ?? null;
 }
 
 export function getMediaFileUrl(value: unknown): string | null {
