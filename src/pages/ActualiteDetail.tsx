@@ -3,7 +3,11 @@ import { Link, useParams } from 'react-router-dom';
 import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import Icon from '../components/Icon';
 import PageHeader from '../components/PageHeader';
-import { fetchActualites, type Actualite } from '../data/actualitesApi';
+import {
+  fetchActualites,
+  formatPublicationDate,
+  type Actualite,
+} from '../data/actualitesApi';
 
 const publicOrigin = 'https://www.mairie-bingerville.ci';
 
@@ -59,6 +63,9 @@ export default function ActualiteDetail() {
   const articlePath = `/actualites/${article.id}`;
   const articleUrl = `${publicOrigin}${articlePath}`;
   const shareText = `${article.title} — ${articleUrl}`;
+  const relatedArticles = news
+    .filter((item) => item.id !== article.id)
+    .slice(0, 3);
 
   return (
     <>
@@ -78,7 +85,7 @@ export default function ActualiteDetail() {
             <span className="rounded-full bg-mairie-lagoonSoft px-3 py-1 text-mairie-lagoonDeep">
               {article.category}
             </span>
-            <span className="todo-note px-3 py-1">{article.date}</span>
+            <span className="todo-note px-3 py-1">{formatPublicationDate(article.date)}</span>
           </div>
           <img
             src={article.imageUrl}
@@ -127,6 +134,30 @@ export default function ActualiteDetail() {
           </Link>
         </div>
       </article>
+      {relatedArticles.length > 0 && (
+        <section aria-labelledby="related-news-heading" className="border-t border-mairie-line bg-white py-10 sm:py-12">
+          <div className="wrap">
+            <h2 id="related-news-heading" className="font-serif text-2xl font-semibold text-mairie-brown">
+              À lire aussi
+            </h2>
+            <ul className="mt-5 grid gap-4 md:grid-cols-3">
+              {relatedArticles.map((item) => (
+                <li key={item.id} className="card">
+                  <Link
+                    className="block min-h-11 p-5 text-mairie-brown underline-offset-4 hover:text-mairie-lagoon hover:underline"
+                    to={`/actualites/${item.id}`}
+                  >
+                    <span className="block font-serif text-lg font-semibold">{item.title}</span>
+                    <span className="mt-2 block text-sm leading-6 text-mairie-muted">
+                      {item.summary}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
     </>
   );
 }
