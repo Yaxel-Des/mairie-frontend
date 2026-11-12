@@ -53,7 +53,10 @@ export function formatPublicationDate(date: string | null | undefined): string {
 }
 
 export async function fetchActualites(signal?: AbortSignal): Promise<Actualite[]> {
-  const result = await fetchApiData<StrapiActualite[]>('/api/actualites?populate=*', signal);
+  const result = await fetchApiData<StrapiActualite[]>(
+    '/api/actualites?populate=*&sort=DatePublication:desc',
+    signal,
+  );
   if (!Array.isArray(result)) {
     throw new Error('La réponse de Strapi ne contient pas de liste d’actualités.');
   }
