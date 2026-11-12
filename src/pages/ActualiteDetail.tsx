@@ -6,6 +6,7 @@ import PageHeader from '../components/PageHeader';
 import {
   fetchActualites,
   formatPublicationDate,
+  truncateSummary,
   type Actualite,
 } from '../data/actualitesApi';
 
@@ -149,7 +150,7 @@ export default function ActualiteDetail() {
                   >
                     <span className="block font-serif text-lg font-semibold">{item.title}</span>
                     <span className="mt-2 block text-sm leading-6 text-mairie-muted">
-                      {item.summary}
+                      {truncateSummary(item.summary)}
                     </span>
                   </Link>
                 </li>
