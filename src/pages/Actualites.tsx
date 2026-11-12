@@ -10,6 +10,7 @@ import {
   type Actualite,
 } from '../data/actualitesApi';
 
+
 export default function Actualites() {
   const [news, setNews] = useState<Actualite[]>([]);
   const [isLoading, setIsLoading] = useState(true);

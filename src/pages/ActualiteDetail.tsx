@@ -130,6 +130,7 @@ export default function ActualiteDetail() {
           </section>
 
 
+
         </div>
       </article>
       {relatedArticles.length > 0 && (
