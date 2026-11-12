@@ -13,6 +13,7 @@ const statusStyle: Record<string, string> = {
   Terminé: 'border-mairie-green',
 };
 
+
 async function loadProjets(signal: AbortSignal) {
   const [settings, projects] = await Promise.all([
     getProjetsParametres(signal),

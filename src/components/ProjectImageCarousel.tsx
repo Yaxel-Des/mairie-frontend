@@ -10,7 +10,13 @@ export default function ProjectImageCarousel({ images, projectTitle }: ProjectIm
   const mediaItems = getMediaItems(images);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: mediaItems.length > 1 });
 
-  if (mediaItems.length === 0) return null;
+  if (mediaItems.length === 0) {
+    return (
+      <p className="mb-5 border border-mairie-line bg-mairie-mist px-4 py-3 text-sm text-mairie-muted" role="status">
+        Aucune image disponible.
+      </p>
+    );
+  }
 
   return (
     <div className="mb-5">
