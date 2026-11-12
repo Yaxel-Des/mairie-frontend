@@ -98,20 +98,37 @@ export function getContactParametres(signal?: AbortSignal): Promise<StrapiRecord
 export function getImageUrl(
   imageArray: unknown,
 ): string {
-  const image = Array.isArray(imageArray) ? imageArray[0] : imageArray;
-  if (!image || typeof image !== 'object' || !('url' in image) || typeof image.url !== 'string') {
-    return actualitePlaceholder;
+  return getMediaUrl(imageArray) ?? actualitePlaceholder;
+}
+
+export function getMediaUrl(value: unknown): string | null {
+  let media = value;
+  while (true) {
+    if (Array.isArray(media)) {
+      media = media[0];
+      continue;
+    }
+    if (!media || typeof media !== 'object') return null;
+    if ('url' in media && typeof media.url === 'string' && media.url.trim()) {
+      const url = media.url.trim();
+      if (/^https?:\/\//i.test(url)) return url;
+      if (url.startsWith('//')) return `https:${url}`;
+      return `${apiOrigin ?? ''}${url.startsWith('/') ? '' : '/'}${url}`;
+    }
+    if ('data' in media) {
+      media = media.data;
+      continue;
+    }
+    if ('attributes' in media) {
+      media = media.attributes;
+      continue;
+    }
+    return null;
   }
-  if (/^https?:\/\//i.test(image.url)) return image.url;
-  return `${apiOrigin ?? ''}${image.url}`;
 }
 
 export function getMediaFileUrl(value: unknown): string | null {
-  const media = Array.isArray(value) ? value[0] : value;
-  if (!media || typeof media !== 'object' || !('url' in media) || typeof media.url !== 'string') {
-    return null;
-  }
-  return /^https?:\/\//i.test(media.url) ? media.url : `${apiOrigin ?? ''}${media.url}`;
+  return getMediaUrl(value);
 }
 
 export function getTextField(record: StrapiRecord | null, ...keys: string[]): string {

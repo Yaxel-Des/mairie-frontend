@@ -2,7 +2,7 @@ import ApiError from '../components/ApiError';
 import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import PageHeader from '../components/PageHeader';
-import { getCmsContentField, getProjets, getProjetsParametres, getTextField } from '../data/api';
+import { getCmsContentField, getMediaUrl, getProjets, getProjetsParametres, getTextField } from '../data/api';
 import useApiResource from '../hooks/useApiResource';
 
 const unavailableMessage = 'Cette information sera bientôt disponible.';
@@ -55,9 +55,20 @@ export default function Projets() {
                   const status = getTextField(project, 'Statut');
                   const border = statusStyle[status] ?? 'border-mairie-line';
                   const description = getCmsContentField(project, 'Description');
+                  const imageUrl = getMediaUrl(project.Image);
                   return (
                     <li key={project.documentId || project.id} className={`card border-l-4 ${border} p-5 sm:p-6`}>
                       <article>
+                        {imageUrl && (
+                          <img
+                            src={imageUrl}
+                            alt={getTextField(project, 'Titre') || 'Illustration du projet communal'}
+                            className="mb-5 aspect-[16/9] w-full border border-mairie-line object-cover"
+                            width="960"
+                            height="540"
+                            loading="lazy"
+                          />
+                        )}
                         <h2 className="font-serif text-xl font-semibold leading-snug text-mairie-brown">
                           {getTextField(project, 'Titre')}
                         </h2>
