@@ -92,6 +92,13 @@ a {
     @apply mb-4 leading-relaxed;
   }
 
+  @media (min-width: 768px) {
+    .cms-content p {
+      text-align: justify;
+      word-spacing: 0.05em;
+    }
+  }
+
   .cms-content h2,
   .cms-content h3,
   .cms-content h4 {
