@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ExpandableCmsContent from '../components/ExpandableCmsContent';
 import Icon from '../components/Icon';
+import ProjectImageCarousel from '../components/ProjectImageCarousel';
 import PageHeader from '../components/PageHeader';
 import {
   fetchActualites,
@@ -86,13 +87,9 @@ export default function ActualiteDetail() {
             </span>
             <span className="todo-note px-3 py-1">{formatPublicationDate(article.date)}</span>
           </div>
-          <img
-            src={article.imageUrl}
-            alt={article.imageAlt || article.title}
-            className="mt-5 aspect-[4/3] w-full rounded-lg border border-mairie-line object-cover sm:aspect-[16/9]"
-            width="640"
-            height="480"
-          />
+          <div className="mt-5">
+            <ProjectImageCarousel images={article.images} projectTitle={article.title} />
+          </div>
           <div className="mt-6 rounded-lg border border-mairie-line bg-white p-5 sm:p-7">
             <ExpandableCmsContent
               key={article.id}

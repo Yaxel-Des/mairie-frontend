@@ -1,4 +1,4 @@
-import { fetchApiData, getImageUrl, richTextToPlainText } from './api';
+import { fetchApiData, getMediaItems, richTextToPlainText } from './api';
 
 export type Actualite = {
   id: number;
@@ -7,6 +7,7 @@ export type Actualite = {
   date: string;
   summary: string;
   content: unknown;
+  images: unknown;
   imageUrl: string;
   imageAlt: string;
 };
@@ -16,10 +17,7 @@ type StrapiActualite = {
   Titre?: string;
   Contenu?: unknown;
   DatePublication?: string | null;
-  Image?: Array<{
-    url?: string | null;
-    alternativeText?: string | null;
-  }> | null;
+  Image?: unknown;
   category?: {
     Nom?: string | null;
   } | null;
@@ -66,6 +64,8 @@ export async function fetchActualites(signal?: AbortSignal): Promise<Actualite[]
     }
 
     const content = item.Contenu ?? '';
+    const images = getMediaItems(item.Image);
+    const firstImage = images[0];
     return {
       id: item.id,
       title: item.Titre,
@@ -73,8 +73,9 @@ export async function fetchActualites(signal?: AbortSignal): Promise<Actualite[]
       date: item.DatePublication || '',
       summary: richTextToPlainText(content) || item.Titre,
       content,
-      imageUrl: item.Image?.[0] ? getImageUrl(item.Image) : actualitePlaceholder,
-      imageAlt: item.Image?.[0]?.alternativeText || '',
+      images: item.Image,
+      imageUrl: firstImage?.url ?? actualitePlaceholder,
+      imageAlt: firstImage?.alternativeText ?? '',
     };
   });
 }
