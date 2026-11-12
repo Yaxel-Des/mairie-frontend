@@ -78,9 +78,11 @@ export default function ActualiteDetail() {
       <meta property="og:image" content={article.imageUrl.startsWith('http') ? article.imageUrl : `${publicOrigin}${article.imageUrl}`} />
       <meta property="og:image:alt" content="Illustration de la Mairie de Bingerville" />
 
-      <PageHeader title={article.title} intro={article.summary} />
       <article className="wrap py-8 sm:py-10">
         <div className="mx-auto max-w-3xl">
+          <h1 className="font-serif text-3xl font-semibold leading-tight text-mairie-brown sm:text-4xl">
+            {article.title}
+          </h1>
           <div className="flex flex-wrap gap-2 text-sm font-semibold text-mairie-muted">
             <span className="rounded-full bg-mairie-lagoonSoft px-3 py-1 text-mairie-lagoonDeep">
               {article.category}
@@ -90,7 +92,7 @@ export default function ActualiteDetail() {
           <img
             src={article.imageUrl}
             alt={article.imageAlt || article.title}
-            className="mt-6 aspect-[4/3] w-full rounded-lg border border-mairie-line object-cover sm:aspect-[16/9]"
+            className="mt-5 aspect-[4/3] w-full rounded-lg border border-mairie-line object-cover sm:aspect-[16/9]"
             width="640"
             height="480"
           />
