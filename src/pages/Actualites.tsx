@@ -66,17 +66,17 @@ export default function Actualites() {
                     height="480"
                     loading="lazy"
                   />
-                  <div className="flex flex-1 flex-col p-5">
-                    <div className="flex flex-wrap gap-2 text-sm font-semibold text-mairie-muted">
-                      <span className="rounded-full bg-mairie-lagoonSoft px-2.5 py-1 text-mairie-lagoonDeep">
-                        {item.category}
-                      </span>
-                      <span className="todo-note px-2.5 py-1">{formatPublicationDate(item.date)}</span>
-                    </div>
-                    <h2 className="mt-3 font-serif text-xl font-semibold leading-snug text-mairie-brown">
+                  <div className="flex flex-1 flex-col gap-2 p-5">
+                    <span className="self-start rounded-full bg-mairie-lagoonSoft px-2.5 py-1 text-sm font-semibold text-mairie-lagoonDeep">
+                      {item.category}
+                    </span>
+                    <span className="todo-note self-start px-2.5 py-1 text-sm font-semibold text-mairie-muted">
+                      {formatPublicationDate(item.date)}
+                    </span>
+                    <h2 className="font-serif text-xl font-semibold leading-snug text-mairie-brown">
                       {item.title}
                     </h2>
-                    <p className="mt-2 min-h-[4.5rem] line-clamp-3 text-sm leading-6 text-mairie-muted">
+                    <p className="min-h-[4.5rem] line-clamp-3 text-sm leading-6 text-mairie-muted">
                       {truncateSummary(item.summary)}
                     </p>
                     <Link

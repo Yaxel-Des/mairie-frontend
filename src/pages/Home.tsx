@@ -215,17 +215,17 @@ export default function Home() {
                     width="640"
                     height="480"
                   />
-                  <div className="flex flex-1 flex-col p-5">
-                    <span className="rounded-full bg-mairie-lagoonSoft px-2.5 py-1 text-sm font-semibold text-mairie-lagoonDeep">
+                  <div className="flex flex-1 flex-col gap-2 p-5">
+                    <span className="self-start rounded-full bg-mairie-lagoonSoft px-2.5 py-1 text-sm font-semibold text-mairie-lagoonDeep">
                       {item.category}
                     </span>
-                    <p className="todo-note inline-block px-2.5 py-1 font-semibold">
+                    <span className="todo-note self-start px-2.5 py-1 text-sm font-semibold">
                       {formatPublicationDate(item.date)}
-                    </p>
-                    <h3 className="mt-3 font-serif text-xl font-semibold leading-snug text-mairie-brown">
+                    </span>
+                    <h3 className="font-serif text-xl font-semibold leading-snug text-mairie-brown">
                       {item.title}
                     </h3>
-                    <p className="mt-2 min-h-[4.5rem] line-clamp-3 text-sm leading-6 text-mairie-muted">
+                    <p className="min-h-[4.5rem] line-clamp-3 text-sm leading-6 text-mairie-muted">
                       {truncateSummary(item.summary)}
                     </p>
                     <Link
