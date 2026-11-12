@@ -1,5 +1,5 @@
 import ApiError from '../components/ApiError';
-import ExpandableCmsContent from '../components/ExpandableCmsContent';
+import CmsContent from '../components/CmsContent';
 import Loading from '../components/Loading';
 import PageHeader from '../components/PageHeader';
 import { getCmsContentField, getPageLegale } from '../data/api';
@@ -22,7 +22,7 @@ export default function MentionsLegales() {
 
         {!isLoading && !error && content ? (
           <section aria-label="Mentions légales" className="card p-6 sm:p-8">
-            <ExpandableCmsContent html={content} />
+            <CmsContent content={content} />
           </section>
         ) : null}
       </article>
