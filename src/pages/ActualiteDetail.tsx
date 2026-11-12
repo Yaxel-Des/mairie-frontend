@@ -52,9 +52,6 @@ export default function ActualiteDetail() {
           intro={errorMessage || 'Cette actualité n’est pas disponible.'}
         />
         <div className="wrap py-8">
-          <Link className="text-link inline-flex min-h-11 items-center" to="/actualites">
-            Retour aux actualités
-          </Link>
         </div>
       </>
     );
@@ -135,9 +132,7 @@ export default function ActualiteDetail() {
             </ul>
           </section>
 
-          <Link className="text-link mt-7 inline-flex min-h-11 items-center" to="/actualites">
-            Retour aux actualités
-          </Link>
+
         </div>
       </article>
       {relatedArticles.length > 0 && (
