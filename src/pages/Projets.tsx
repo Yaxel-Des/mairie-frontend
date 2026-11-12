@@ -24,7 +24,17 @@ async function loadProjets(signal: AbortSignal) {
 
 export default function Projets() {
   const { data, isLoading, error } = useApiResource(loadProjets);
-  const projects = data?.projects ?? [];
+  const projects = [...(data?.projects ?? [])].sort((a, b) => {
+    const dateA = Date.parse(typeof a.createdAt === 'string' ? a.createdAt : '');
+    const dateB = Date.parse(typeof b.createdAt === 'string' ? b.createdAt : '');
+    const hasDateA = Number.isFinite(dateA);
+    const hasDateB = Number.isFinite(dateB);
+
+    if (!hasDateA && !hasDateB) return 0;
+    if (!hasDateA) return 1;
+    if (!hasDateB) return -1;
+    return dateB - dateA;
+  });
   const introduction = getCmsContentField(data?.settings ?? null, 'Introduction');
 
   return (

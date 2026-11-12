@@ -31,6 +31,20 @@ export function truncateSummary(summary: string, maxLength = 150): string {
   return `${normalizedSummary.slice(0, maxLength - 3).trimEnd()}...`;
 }
 
+export function sortActualitesByDateDesc(actualites: readonly Actualite[]): Actualite[] {
+  return [...actualites].sort((a, b) => {
+    const dateA = Date.parse(a.date);
+    const dateB = Date.parse(b.date);
+    const hasDateA = Number.isFinite(dateA);
+    const hasDateB = Number.isFinite(dateB);
+
+    if (!hasDateA && !hasDateB) return 0;
+    if (!hasDateA) return 1;
+    if (!hasDateB) return -1;
+    return dateB - dateA;
+  });
+}
+
 export function formatPublicationDate(date: string | null | undefined): string {
   if (!date?.trim()) return 'Date non spécifiée';
 

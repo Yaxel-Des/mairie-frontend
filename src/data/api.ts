@@ -80,7 +80,7 @@ export function getDocuments(signal?: AbortSignal): Promise<StrapiRecord[]> {
 }
 
 export function getProjets(signal?: AbortSignal): Promise<StrapiRecord[]> {
-  return getCollection('/api/projets?populate=*', signal);
+  return getCollection('/api/projets?populate=*&sort=createdAt:desc', signal);
 }
 
 export function getProjetsParametres(signal?: AbortSignal): Promise<StrapiRecord | null> {

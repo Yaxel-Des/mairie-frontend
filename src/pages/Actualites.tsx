@@ -6,6 +6,7 @@ import PageHeader from '../components/PageHeader';
 import {
   fetchActualites,
   formatPublicationDate,
+  sortActualitesByDateDesc,
   truncateSummary,
   type Actualite,
 } from '../data/actualitesApi';
@@ -13,6 +14,7 @@ import {
 
 export default function Actualites() {
   const [news, setNews] = useState<Actualite[]>([]);
+  const sortedNews = sortActualitesByDateDesc(news);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -53,7 +55,7 @@ export default function Actualites() {
           <p className="todo-note" role="status">Aucune actualité n’est disponible pour le moment.</p>
         ) : (
           <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {news.map((item) => (
+            {sortedNews.map((item) => (
               <li
                 key={item.id}
                 className="card group relative h-full overflow-hidden transition-colors hover:border-mairie-lagoon"

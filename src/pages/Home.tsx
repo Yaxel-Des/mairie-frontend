@@ -15,6 +15,7 @@ import {
 import {
   fetchActualites,
   formatPublicationDate,
+  sortActualitesByDateDesc,
   truncateSummary,
   type Actualite,
 } from '../data/actualitesApi';
@@ -53,13 +54,7 @@ export default function Home() {
     return () => controller.abort();
   }, []);
 
-  const latestNews = [...news]
-    .sort((a, b) => {
-      const dateA = Date.parse(a.date);
-      const dateB = Date.parse(b.date);
-      return (Number.isNaN(dateB) ? 0 : dateB) - (Number.isNaN(dateA) ? 0 : dateA);
-    })
-    .slice(0, 3);
+  const latestNews = sortActualitesByDateDesc(news).slice(0, 3);
   const mayorMessage = getCmsContentField(accueil, 'MotDuMaire');
   const mayorName = getTextField(accueil, 'NomMaire') || 'Le Maire de Bingerville';
   const mayorPhoto = getImageUrl(accueil?.PhotoMaire);
