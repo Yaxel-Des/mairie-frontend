@@ -4,6 +4,7 @@ import { getCmsMarkdown, richTextToHtml, richTextToPlainText } from '../data/api
 
 type ExpandableCmsContentProps = {
   html: unknown;
+  initiallyExpanded?: boolean;
 };
 
 function truncateText(text: string, limit: number): string {
@@ -14,8 +15,11 @@ function truncateText(text: string, limit: number): string {
   return `${excerpt.trimEnd()}...`;
 }
 
-export default function ExpandableCmsContent({ html }: ExpandableCmsContentProps) {
-  const [expanded, setExpanded] = useState(false);
+export default function ExpandableCmsContent({
+  html,
+  initiallyExpanded = false,
+}: ExpandableCmsContentProps) {
+  const [expanded, setExpanded] = useState(initiallyExpanded);
   const contentId = useId();
   const markdown = getCmsMarkdown(html);
   const safeHtml = richTextToHtml(html);

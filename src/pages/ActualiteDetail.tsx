@@ -6,7 +6,6 @@ import PageHeader from '../components/PageHeader';
 import {
   fetchActualites,
   formatPublicationDate,
-  truncateSummary,
   type Actualite,
 } from '../data/actualitesApi';
 
@@ -96,7 +95,11 @@ export default function ActualiteDetail() {
             height="480"
           />
           <div className="mt-6 rounded-lg border border-mairie-line bg-white p-5 sm:p-7">
-            <ExpandableCmsContent html={article.content || article.summary} />
+            <ExpandableCmsContent
+              key={article.id}
+              html={article.content || article.summary}
+              initiallyExpanded
+            />
           </div>
 
           <section aria-labelledby="share-article-heading" className="mt-7">
@@ -141,21 +144,22 @@ export default function ActualiteDetail() {
             <h2 id="related-news-heading" className="font-serif text-2xl font-semibold text-mairie-brown">
               À lire aussi
             </h2>
-            <ul className="mt-5 grid gap-4 md:grid-cols-3">
+            <ul className="mt-5 divide-y divide-mairie-line border-y border-mairie-line">
               {relatedArticles.map((item) => (
-                <li key={item.id} className="card">
+                <li key={item.id}>
                   <Link
-                    className="block min-h-11 p-5 text-mairie-brown underline-offset-4 hover:text-mairie-lagoon hover:underline"
+                    className="flex min-h-14 flex-wrap items-center justify-between gap-x-5 gap-y-1 py-3 text-mairie-brown underline-offset-4 hover:text-mairie-lagoon hover:underline"
                     to={`/actualites/${item.id}`}
                   >
-                    <span className="block font-serif text-lg font-semibold">{item.title}</span>
-                    <span className="mt-2 block text-sm leading-6 text-mairie-muted">
-                      {truncateSummary(item.summary)}
-                    </span>
+                    <span className="font-serif font-semibold">{item.title}</span>
+                    <span className="text-sm text-mairie-muted">{formatPublicationDate(item.date)}</span>
                   </Link>
                 </li>
               ))}
             </ul>
+            <Link className="btn-primary mt-5" to="/actualites">
+              Toutes les actualités
+            </Link>
           </div>
         </section>
       )}
